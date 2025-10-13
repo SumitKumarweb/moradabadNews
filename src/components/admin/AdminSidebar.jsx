@@ -12,6 +12,7 @@ import {
   Briefcase,
   Users,
   Megaphone,
+  BarChart3,
 } from "lucide-react"
 
 const navItems = [
@@ -59,6 +60,11 @@ const navItems = [
     title: "Applications",
     to: "/nimda/applications",
     icon: Users,
+  },
+  {
+    title: "Analytics",
+    to: "/nimda/analytics",
+    icon: BarChart3,
   },
   {
     title: "Settings",

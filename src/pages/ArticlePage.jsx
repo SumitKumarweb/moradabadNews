@@ -5,6 +5,7 @@ import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
 import SEO from '../components/SEO'
+import useAnalytics from '../hooks/use-analytics'
 import {
   getArticleById,
   getRecommendedArticles,
@@ -26,6 +27,14 @@ export default function ArticlePage() {
   const [article, setArticle] = useState(null)
   const [recommendedArticles, setRecommendedArticles] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Track article view with analytics
+  useAnalytics({
+    pageType: 'article',
+    articleId: article?.id,
+    articleTitle: article?.title,
+    category: article?.category,
+  })
 
   useEffect(() => {
     let isMounted = true

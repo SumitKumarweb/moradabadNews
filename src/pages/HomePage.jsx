@@ -7,6 +7,7 @@ import { NewsByCategory } from '../components/NewsByCategory'
 import { VideoSection } from '../components/VideoSection'
 import { HeaderBanner } from '../components/HeaderBanner'
 import SEO from '../components/SEO'
+import useAnalytics from '../hooks/use-analytics'
 import { 
   getFeaturedArticles, 
   getTrendingArticles,
@@ -26,6 +27,9 @@ export default function HomePage() {
   const [activeVideo, setActiveVideo] = useState(null)
   const [headerBanners, setHeaderBanners] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Track homepage visit
+  useAnalytics({ pageType: 'home' })
 
   useEffect(() => {
     loadAllData()

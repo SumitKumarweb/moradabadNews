@@ -5,6 +5,7 @@ import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
 import SEO from '../components/SEO'
+import useAnalytics from '../hooks/use-analytics'
 import { getArticlesByCategory } from '../lib/firebase-service'
 import { Loader2 } from 'lucide-react'
 
@@ -20,6 +21,12 @@ export default function CategoryPage() {
   const { category } = useParams()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Track category page visit
+  useAnalytics({ 
+    pageType: 'category',
+    category: category
+  })
 
   useEffect(() => {
     let isMounted = true

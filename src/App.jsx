@@ -24,6 +24,7 @@ import AdminMessages from './pages/admin/AdminMessages'
 import AdminHeaders from './pages/admin/AdminHeaders'
 import AdminVideos from './pages/admin/AdminVideos'
 import AdminQuiz from './pages/admin/AdminQuiz'
+import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminSettings from './pages/admin/AdminSettings'
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
           <Route path="/nimda/headers" element={<AdminHeaders />} />
           <Route path="/nimda/videos" element={<AdminVideos />} />
           <Route path="/nimda/quiz" element={<AdminQuiz />} />
+          <Route path="/nimda/analytics" element={<AdminAnalytics />} />
           <Route path="/nimda/settings" element={<AdminSettings />} />
 
           {/* 404 */}
