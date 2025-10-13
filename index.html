@@ -42,6 +42,20 @@
     <link rel="canonical" href="https://moradabads.com/" />
   </head>
   <body>
+    <script>
+      // Apply theme before React loads to prevent flash
+      (function() {
+        const theme = localStorage.getItem('moradabad-news-theme') || 'light';
+        const root = document.documentElement;
+        
+        if (theme === 'system') {
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          root.classList.add(systemTheme);
+        } else {
+          root.classList.add(theme);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
