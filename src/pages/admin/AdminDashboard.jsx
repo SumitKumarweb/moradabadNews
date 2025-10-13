@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
-import { getAllArticles, getAllQuizQuestions } from '../../lib/firebase-service'
-import { FileText, TrendingUp, Eye, HelpCircle } from 'lucide-react'
+import { getAllArticles, getAllQuizQuestions, getQuizCompletionCount } from '../../lib/firebase-service'
+import { FileText, TrendingUp, Eye, HelpCircle, CheckCircle2 } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -10,6 +10,7 @@ export default function AdminDashboard() {
     trendingArticles: 0,
     totalViews: 0,
     totalQuizQuestions: 0,
+    quizCompletions: 0,
   })
 
   useEffect(() => {
@@ -19,6 +20,7 @@ export default function AdminDashboard() {
   async function loadStats() {
     const articles = await getAllArticles()
     const quizQuestions = await getAllQuizQuestions()
+    const completionCount = await getQuizCompletionCount()
 
     const totalViews = articles.reduce((sum, article) => sum + article.views, 0)
     const trendingCount = articles.filter((article) => article.isTrending).length
@@ -28,6 +30,7 @@ export default function AdminDashboard() {
       trendingArticles: trendingCount,
       totalViews,
       totalQuizQuestions: quizQuestions.length,
+      quizCompletions: completionCount,
     })
   }
 
@@ -39,7 +42,7 @@ export default function AdminDashboard() {
           <p className="text-muted-foreground">Overview of your news website</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Articles</CardTitle>
@@ -81,6 +84,17 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalQuizQuestions}</div>
               <p className="text-xs text-muted-foreground">Current affairs quiz</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Quiz Completions</CardTitle>
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.quizCompletions}</div>
+              <p className="text-xs text-muted-foreground">Total completions</p>
             </CardContent>
           </Card>
         </div>

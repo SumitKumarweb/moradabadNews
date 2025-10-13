@@ -10,15 +10,22 @@ import {
   addQuizQuestion,
   updateQuizQuestion,
   deleteQuizQuestion,
+  addQuizQuestionBatch,
+  getAllBatches,
+  deleteBatch,
 } from "../../lib/firebase-service"
-import { Plus, Pencil, Trash2, Loader2, Upload } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, Upload, Layers, List, Calendar } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { Badge } from "../../components/ui/badge"
 import { useToast } from "../../hooks/use-toast"
 
 export default function AdminQuiz() {
   const [questions, setQuestions] = useState([])
+  const [batches, setBatches] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState(null)
+  const [viewMode, setViewMode] = useState("batches") // "batches" or "all"
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
@@ -35,13 +42,17 @@ export default function AdminQuiz() {
   const fileInputRef = useRef(null)
 
   useEffect(() => {
-    loadQuestions()
+    loadData()
   }, [])
 
-  async function loadQuestions() {
+  async function loadData() {
     setLoading(true)
-    const data = await getAllQuizQuestions()
-    setQuestions(data)
+    const [allQuestions, allBatches] = await Promise.all([
+      getAllQuizQuestions(),
+      getAllBatches()
+    ])
+    setQuestions(allQuestions)
+    setBatches(allBatches)
     setLoading(false)
   }
 
@@ -61,7 +72,7 @@ export default function AdminQuiz() {
       const success = await updateQuizQuestion(editingQuestion.id, questionData)
       if (success) {
         toast({ title: "Question updated successfully" })
-        loadQuestions()
+        loadData()
         resetForm()
       } else {
         toast({ title: "Failed to update question", variant: "destructive" })
@@ -70,7 +81,7 @@ export default function AdminQuiz() {
       const id = await addQuizQuestion(questionData)
       if (id) {
         toast({ title: "Question added successfully" })
-        loadQuestions()
+        loadData()
         resetForm()
       } else {
         toast({ title: "Failed to add question", variant: "destructive" })
@@ -98,7 +109,7 @@ export default function AdminQuiz() {
       const success = await deleteQuizQuestion(id)
       if (success) {
         toast({ title: "Question deleted successfully" })
-        loadQuestions()
+        loadData()
       } else {
         toast({ title: "Failed to delete question", variant: "destructive" })
       }
@@ -118,7 +129,8 @@ export default function AdminQuiz() {
         return
       }
 
-      let successCount = 0
+      // Validate questions
+      const validQuestions = []
       let errorCount = 0
 
       for (const q of importedQuestions) {
@@ -127,33 +139,45 @@ export default function AdminQuiz() {
           continue
         }
 
-        const questionData = {
+        validQuestions.push({
           question: q.question,
           options: q.options,
           correctAnswer: q.correctAnswer,
           explanation: q.explanation || "",
           category: q.category || "current-affairs",
-          createdAt: new Date().toISOString(),
-        }
-
-        const id = await addQuizQuestion(questionData)
-        if (id) {
-          successCount++
-        } else {
-          errorCount++
-        }
+        })
       }
 
-      toast({
-        title: `Import complete: ${successCount} added, ${errorCount} failed`,
-      })
+      // Add as batch (automatically assigns batch number and handles cleanup)
+      const result = await addQuizQuestionBatch(validQuestions)
 
-      loadQuestions()
+      if (result.success) {
+        toast({
+          title: `Batch ${result.batchNumber} imported successfully!`,
+          description: `${result.count} questions added${errorCount > 0 ? `, ${errorCount} failed` : ''}`,
+        })
+      } else {
+        toast({ title: "Failed to import batch", variant: "destructive" })
+      }
+
+      loadData()
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
     } catch (error) {
       toast({ title: "Failed to parse JSON file", variant: "destructive" })
+    }
+  }
+
+  const handleDeleteBatch = async (batchNumber) => {
+    if (confirm(`Are you sure you want to delete Batch ${batchNumber}? This will delete all questions in this batch.`)) {
+      const success = await deleteBatch(batchNumber)
+      if (success) {
+        toast({ title: `Batch ${batchNumber} deleted successfully` })
+        loadData()
+      } else {
+        toast({ title: "Failed to delete batch", variant: "destructive" })
+      }
     }
   }
 
@@ -295,47 +319,116 @@ export default function AdminQuiz() {
           </Card>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Quiz Questions ({questions.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {questions.map((question) => (
-                <div key={question.id} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{question.question}</h3>
-                      <div className="mt-2 space-y-1">
-                        {question.options.map((option, index) => (
-                          <div
-                            key={index}
-                            className={`text-sm ${index === question.correctAnswer ? "text-green-600 font-medium" : "text-muted-foreground"}`}
-                          >
-                            {index + 1}. {option} {index === question.correctAnswer && "✓"}
+        <Tabs defaultValue="batches" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="batches">
+              <Layers className="h-4 w-4 mr-2" />
+              Batches View
+            </TabsTrigger>
+            <TabsTrigger value="all">
+              <List className="h-4 w-4 mr-2" />
+              All Questions
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="batches">
+            <Card>
+              <CardHeader>
+                <CardTitle>Question Batches ({batches.length} batches)</CardTitle>
+                <CardDescription>
+                  Each batch contains 50 questions. System automatically rotates batches daily and deletes batches older than 30 days.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {batches.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">
+                      No batches found. Import your first batch using the "Import JSON" button.
+                    </p>
+                  ) : (
+                    batches.map((batch) => (
+                      <div key={batch.batchNumber} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <h3 className="text-lg font-semibold">Batch {batch.batchNumber}</h3>
+                              <Badge variant="secondary">
+                                {batch.questionCount} questions
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                              <Calendar className="h-4 w-4" />
+                              <span>Added: {new Date(batch.batchDate).toLocaleDateString()}</span>
+                            </div>
                           </div>
-                        ))}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteBatch(batch.batchNumber)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Batch
+                          </Button>
+                        </div>
                       </div>
-                      {question.explanation && (
-                        <p className="text-sm text-muted-foreground mt-2">
-                          <strong>Explanation:</strong> {question.explanation}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(question)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(question.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
+                    ))
+                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="all">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Quiz Questions ({questions.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {questions.map((question) => (
+                    <div key={question.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="font-semibold">{question.question}</h3>
+                            {question.batchNumber && (
+                              <Badge variant="outline" className="text-xs">
+                                Batch {question.batchNumber}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="mt-2 space-y-1">
+                            {question.options.map((option, index) => (
+                              <div
+                                key={index}
+                                className={`text-sm ${index === question.correctAnswer ? "text-green-600 font-medium" : "text-muted-foreground"}`}
+                              >
+                                {index + 1}. {option} {index === question.correctAnswer && "✓"}
+                              </div>
+                            ))}
+                          </div>
+                          {question.explanation && (
+                            <p className="text-sm text-muted-foreground mt-2">
+                              <strong>Explanation:</strong> {question.explanation}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" onClick={() => handleEdit(question)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => handleDelete(question.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   )

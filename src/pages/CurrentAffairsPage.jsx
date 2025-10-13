@@ -5,7 +5,7 @@ import SEO from "../components/SEO"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
-import { getAllQuizQuestions } from "../lib/firebase-service"
+import { getTodaysBatchQuestions, addQuizCompletion } from "../lib/firebase-service"
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
 import BreadcrumbNav from "../components/BreadcrumbNav"
 
@@ -17,6 +17,7 @@ export default function CurrentAffairsPage() {
   const [score, setScore] = useState(0)
   const [answeredQuestions, setAnsweredQuestions] = useState([])
   const [loading, setLoading] = useState(true)
+  const [completionSaved, setCompletionSaved] = useState(false)
 
   useEffect(() => {
     loadQuestions()
@@ -24,7 +25,7 @@ export default function CurrentAffairsPage() {
 
   async function loadQuestions() {
     setLoading(true)
-    const data = await getAllQuizQuestions()
+    const data = await getTodaysBatchQuestions()
     setQuestions(data)
     setLoading(false)
   }
@@ -36,14 +37,32 @@ export default function CurrentAffairsPage() {
     setSelectedAnswer(optionIndex)
   }
 
-  const handleSubmitAnswer = () => {
+  const handleSubmitAnswer = async () => {
     if (selectedAnswer === null) return
 
     setShowResult(true)
-    if (selectedAnswer === currentQuestion.correctAnswer) {
-      setScore(score + 1)
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer
+    const newScore = isCorrect ? score + 1 : score
+    
+    if (isCorrect) {
+      setScore(newScore)
     }
-    setAnsweredQuestions([...answeredQuestions, currentQuestionIndex])
+    
+    const newAnsweredQuestions = [...answeredQuestions, currentQuestionIndex]
+    setAnsweredQuestions(newAnsweredQuestions)
+    
+    // Check if this was the last question and save completion
+    if (newAnsweredQuestions.length === questions.length && !completionSaved) {
+      const completionData = {
+        totalQuestions: questions.length,
+        score: newScore,
+        percentage: Math.round((newScore / questions.length) * 100),
+      }
+      const id = await addQuizCompletion(completionData)
+      if (id) {
+        setCompletionSaved(true)
+      }
+    }
   }
 
   const handleNextQuestion = () => {
@@ -68,6 +87,7 @@ export default function CurrentAffairsPage() {
     setShowResult(false)
     setScore(0)
     setAnsweredQuestions([])
+    setCompletionSaved(false)
   }
 
   if (loading) {

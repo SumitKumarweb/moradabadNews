@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What is the capital of India?",
+    "options": [
+      "Mumbai",
+      "New Delhi",
+      "Kolkata",
+      "Chennai"
+    ],
+    "correctAnswer": 1,
+    "explanation": "New Delhi is the capital of India and serves as the seat of the Government of India.",
+    "category": "current-affairs"
+  },
+  {
+    "question": "Who is the current Prime Minister of India (as of 2024)?",
+    "options": [
+      "Rahul Gandhi",
+      "Arvind Kejriwal",
+      "Narendra Modi",
+      "Amit Shah"
+    ],
+    "correctAnswer": 2,
+    "explanation": "Narendra Modi has been serving as the Prime Minister of India since 2014."
+  },
+  {
+    "question": "What is the currency of India?",
+    "options": [
+      "Dollar",
+      "Pound",
+      "Rupee",
+      "Euro"
+    ],
+    "correctAnswer": 2,
+    "explanation": "The Indian Rupee (INR) is the official currency of India."
+  }
+]
+
+

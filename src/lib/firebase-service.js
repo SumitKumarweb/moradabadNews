@@ -16,7 +16,7 @@ import { signInWithEmailAndPassword, updatePassword, updateEmail } from "firebas
 
 // Data shape comments for reference:
 // NewsArticle: { id, title, summary, content, category, image, author, publishedAt, tags, isFeatured, isTrending, views, metaTitle?, metaDescription?, metaKeywords?, ogImage? }
-// QuizQuestion: { id, question, options, correctAnswer, explanation?, category, createdAt }
+// QuizQuestion: { id, question, options, correctAnswer, explanation?, category, createdAt, batchNumber?, batchDate? }
 // Category: { id, name, slug, description?, createdAt }
 // FeaturedVideo: { id, videoId, title, description, isActive, createdAt }
 // SiteSettings: { id, siteName, siteDescription, contactEmail, socialMedia: {facebook, twitter, instagram, youtube}, seo: {defaultMetaTitle, defaultMetaDescription, keywords[]} }
@@ -24,6 +24,7 @@ import { signInWithEmailAndPassword, updatePassword, updateEmail } from "firebas
 // JobPosting: { id, title, department, location, type, description, requirements[], responsibilities[], salary?, isActive, postedAt }
 // JobApplication: { id, jobId, jobTitle, name, email, phone, resumeUrl, coverLetter?, status, appliedAt }
 // HeaderBanner: { id, title, content, isActive, backgroundColor?, textColor?, createdAt }
+// QuizCompletion: { id, totalQuestions, score, percentage, completedAt }
 
 // Site Settings Management Functions
 export async function getSiteSettings() {
@@ -745,4 +746,222 @@ export async function setActiveHeaderBanner(id) {
     console.error("Error setting active header banner:", error)
     return false
   }
+}
+
+// Quiz Completion Tracking Functions
+export async function addQuizCompletion(completionData) {
+  try {
+    const completionsRef = collection(db, "quizCompletions")
+    const docRef = await addDoc(completionsRef, {
+      ...completionData,
+      completedAt: Timestamp.now().toDate().toISOString(),
+    })
+    return docRef.id
+  } catch (error) {
+    console.error("Error adding quiz completion:", error)
+    return null
+  }
+}
+
+export async function getAllQuizCompletions() {
+  try {
+    const completionsRef = collection(db, "quizCompletions")
+    const snapshot = await getDocs(completionsRef)
+    const completions = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    return completions.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+  } catch (error) {
+    console.error("Error fetching quiz completions:", error)
+    return []
+  }
+}
+
+export async function getQuizCompletionCount() {
+  try {
+    const completionsRef = collection(db, "quizCompletions")
+    const snapshot = await getDocs(completionsRef)
+    return snapshot.size
+  } catch (error) {
+    console.error("Error fetching quiz completion count:", error)
+    return 0
+  }
+}
+
+// Quiz Batch Management Functions
+export async function getNextBatchNumber() {
+  try {
+    const quizRef = collection(db, "quiz")
+    const snapshot = await getDocs(quizRef)
+    const questions = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    
+    if (questions.length === 0) {
+      return 1
+    }
+    
+    const maxBatch = Math.max(...questions.map(q => q.batchNumber || 0))
+    return maxBatch + 1
+  } catch (error) {
+    console.error("Error getting next batch number:", error)
+    return 1
+  }
+}
+
+export async function addQuizQuestionBatch(questions, batchNumber = null) {
+  try {
+    const batch = batchNumber || await getNextBatchNumber()
+    const batchDate = Timestamp.now().toDate().toISOString()
+    
+    let successCount = 0
+    const quizRef = collection(db, "quiz")
+    
+    for (const q of questions) {
+      const questionData = {
+        ...q,
+        batchNumber: batch,
+        batchDate: batchDate,
+        createdAt: Timestamp.now().toDate().toISOString(),
+      }
+      
+      const docRef = await addDoc(quizRef, questionData)
+      if (docRef.id) {
+        successCount++
+      }
+    }
+    
+    // Auto-delete old batches if we have more than 30
+    await deleteOldBatches()
+    
+    return { success: true, count: successCount, batchNumber: batch }
+  } catch (error) {
+    console.error("Error adding quiz question batch:", error)
+    return { success: false, count: 0 }
+  }
+}
+
+export async function getAllBatches() {
+  try {
+    const quizRef = collection(db, "quiz")
+    const snapshot = await getDocs(quizRef)
+    const questions = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    
+    // Group questions by batch number
+    const batches = {}
+    questions.forEach(q => {
+      const batchNum = q.batchNumber || 0
+      if (!batches[batchNum]) {
+        batches[batchNum] = {
+          batchNumber: batchNum,
+          batchDate: q.batchDate || q.createdAt,
+          questionCount: 0,
+          questions: []
+        }
+      }
+      batches[batchNum].questionCount++
+      batches[batchNum].questions.push(q)
+    })
+    
+    return Object.values(batches).sort((a, b) => b.batchNumber - a.batchNumber)
+  } catch (error) {
+    console.error("Error fetching batches:", error)
+    return []
+  }
+}
+
+export async function getQuestionsByBatch(batchNumber) {
+  try {
+    const quizRef = collection(db, "quiz")
+    const q = query(quizRef, where("batchNumber", "==", batchNumber))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+  } catch (error) {
+    console.error("Error fetching questions by batch:", error)
+    return []
+  }
+}
+
+export async function getTodaysBatchQuestions() {
+  try {
+    const batches = await getAllBatches()
+    
+    if (batches.length === 0) {
+      return []
+    }
+    
+    // Calculate which batch to show today
+    const totalBatches = batches.length
+    
+    // Get the first batch date to calculate day offset
+    const sortedBatches = batches.sort((a, b) => a.batchNumber - b.batchNumber)
+    const firstBatch = sortedBatches[0]
+    const firstBatchDate = new Date(firstBatch.batchDate)
+    const today = new Date()
+    
+    // Calculate days since first batch
+    const daysSinceStart = Math.floor((today - firstBatchDate) / (1000 * 60 * 60 * 24))
+    
+    // Calculate which batch to show (cycles every 30 days or based on total batches)
+    const batchIndex = daysSinceStart % totalBatches
+    const todaysBatch = sortedBatches[batchIndex]
+    
+    // Get questions from today's batch and shuffle them
+    const questions = todaysBatch.questions || []
+    return shuffleArray([...questions])
+  } catch (error) {
+    console.error("Error fetching today's batch questions:", error)
+    return []
+  }
+}
+
+export async function deleteBatch(batchNumber) {
+  try {
+    const quizRef = collection(db, "quiz")
+    const q = query(quizRef, where("batchNumber", "==", batchNumber))
+    const snapshot = await getDocs(q)
+    
+    const deletePromises = snapshot.docs.map((document) =>
+      deleteDoc(doc(db, "quiz", document.id))
+    )
+    
+    await Promise.all(deletePromises)
+    return true
+  } catch (error) {
+    console.error("Error deleting batch:", error)
+    return false
+  }
+}
+
+export async function deleteOldBatches(maxBatches = 30) {
+  try {
+    const batches = await getAllBatches()
+    
+    if (batches.length <= maxBatches) {
+      return { deleted: 0 }
+    }
+    
+    // Sort by batch number and delete oldest ones
+    const sortedBatches = batches.sort((a, b) => a.batchNumber - b.batchNumber)
+    const batchesToDelete = sortedBatches.slice(0, batches.length - maxBatches)
+    
+    let deletedCount = 0
+    for (const batch of batchesToDelete) {
+      const success = await deleteBatch(batch.batchNumber)
+      if (success) {
+        deletedCount++
+      }
+    }
+    
+    return { deleted: deletedCount }
+  } catch (error) {
+    console.error("Error deleting old batches:", error)
+    return { deleted: 0 }
+  }
+}
+
+// Helper function to shuffle array
+function shuffleArray(array) {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
 }
