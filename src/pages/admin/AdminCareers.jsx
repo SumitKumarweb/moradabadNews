@@ -7,10 +7,13 @@ import { Plus, Edit, Trash2, MapPin, Briefcase } from 'lucide-react'
 import { getAllJobs, deleteJob } from '../../lib/firebase-service'
 import { useToast } from '../../hooks/use-toast'
 import { formatDate } from '../../lib/utils'
+import { JobFormDialog } from '../../components/admin/JobFormDialog'
 
 export default function AdminCareers() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingJob, setEditingJob] = useState(null)
   const { toast } = useToast()
 
   const loadJobs = async () => {
@@ -34,6 +37,21 @@ export default function AdminCareers() {
     }
   }
 
+  const handleOpenDialog = (job = null) => {
+    setEditingJob(job)
+    setDialogOpen(true)
+  }
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false)
+    setEditingJob(null)
+  }
+
+  const handleSuccess = () => {
+    loadJobs()
+    handleCloseDialog()
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -42,7 +60,7 @@ export default function AdminCareers() {
             <h1 className="text-3xl font-bold">Manage Careers</h1>
             <p className="text-muted-foreground">Post and manage job openings</p>
           </div>
-          <Button>
+          <Button onClick={() => handleOpenDialog()}>
             <Plus className="mr-2 h-4 w-4" />
             Post Job
           </Button>
@@ -80,7 +98,7 @@ export default function AdminCareers() {
                       <p className="text-xs text-muted-foreground mt-2">Posted: {formatDate(job.postedAt)}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={() => handleOpenDialog(job)}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDelete(job.id)}>
@@ -93,6 +111,13 @@ export default function AdminCareers() {
             ))}
           </div>
         )}
+
+        <JobFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onSuccess={handleSuccess}
+          job={editingJob}
+        />
       </div>
     </AdminLayout>
   )
