@@ -13,69 +13,95 @@ import {
   Users,
   Megaphone,
   BarChart3,
+  UserCog,
 } from "lucide-react"
+import { getCurrentUser, ROLES } from "@/lib/auth-service"
 
-const navItems = [
+// All nav items with role-based access
+const allNavItems = [
   {
     title: "Dashboard",
     to: "/nimda/dashboard",
     icon: LayoutDashboard,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Posts",
     to: "/nimda/posts",
     icon: FileText,
+    roles: [ROLES.MASTER, ROLES.EMPLOYEE], // Both
   },
   {
     title: "Categories",
     to: "/nimda/categories",
     icon: Layers,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Quiz",
     to: "/nimda/quiz",
     icon: HelpCircle,
+    roles: [ROLES.MASTER, ROLES.EMPLOYEE], // Both
   },
   {
     title: "Videos",
     to: "/nimda/videos",
     icon: Video,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Headers",
     to: "/nimda/headers",
     icon: Megaphone,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Messages",
     to: "/nimda/messages",
     icon: Mail,
+    roles: [ROLES.MASTER, ROLES.EMPLOYEE], // Both
   },
   {
     title: "Careers",
     to: "/nimda/careers",
     icon: Briefcase,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Applications",
     to: "/nimda/applications",
     icon: Users,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Analytics",
     to: "/nimda/analytics",
     icon: BarChart3,
+    roles: [ROLES.MASTER], // Only master
+  },
+  {
+    title: "User Management",
+    to: "/nimda/users",
+    icon: UserCog,
+    roles: [ROLES.MASTER], // Only master
   },
   {
     title: "Settings",
     to: "/nimda/settings",
     icon: Settings,
+    roles: [ROLES.MASTER, ROLES.EMPLOYEE], // Both
   },
 ]
 
 export default function AdminSidebar() {
   const location = useLocation()
   const pathname = location.pathname
+  const currentUser = getCurrentUser()
+  
+  // Filter nav items based on user role
+  const navItems = allNavItems.filter(item => 
+    item.roles.includes(currentUser?.role)
+  )
 
   return (
     <aside className="w-64 border-r border-border bg-card">

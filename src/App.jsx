@@ -26,6 +26,10 @@ import AdminVideos from './pages/admin/AdminVideos'
 import AdminQuiz from './pages/admin/AdminQuiz'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
 import AdminSettings from './pages/admin/AdminSettings'
+import AdminUsers from './pages/admin/AdminUsers'
+
+// Components
+import ProtectedRoute from './components/admin/ProtectedRoute'
 
 function App() {
   return (
@@ -44,17 +48,18 @@ function App() {
 
           {/* Admin Routes */}
           <Route path="/nimda" element={<AdminLogin />} />
-          <Route path="/nimda/dashboard" element={<AdminDashboard />} />
-          <Route path="/nimda/posts" element={<AdminPosts />} />
-          <Route path="/nimda/categories" element={<AdminCategories />} />
-          <Route path="/nimda/careers" element={<AdminCareers />} />
-          <Route path="/nimda/applications" element={<AdminApplications />} />
-          <Route path="/nimda/messages" element={<AdminMessages />} />
-          <Route path="/nimda/headers" element={<AdminHeaders />} />
-          <Route path="/nimda/videos" element={<AdminVideos />} />
-          <Route path="/nimda/quiz" element={<AdminQuiz />} />
-          <Route path="/nimda/analytics" element={<AdminAnalytics />} />
-          <Route path="/nimda/settings" element={<AdminSettings />} />
+          <Route path="/nimda/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/nimda/posts" element={<ProtectedRoute><AdminPosts /></ProtectedRoute>} />
+          <Route path="/nimda/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
+          <Route path="/nimda/careers" element={<ProtectedRoute><AdminCareers /></ProtectedRoute>} />
+          <Route path="/nimda/applications" element={<ProtectedRoute><AdminApplications /></ProtectedRoute>} />
+          <Route path="/nimda/messages" element={<ProtectedRoute><AdminMessages /></ProtectedRoute>} />
+          <Route path="/nimda/headers" element={<ProtectedRoute><AdminHeaders /></ProtectedRoute>} />
+          <Route path="/nimda/videos" element={<ProtectedRoute><AdminVideos /></ProtectedRoute>} />
+          <Route path="/nimda/quiz" element={<ProtectedRoute><AdminQuiz /></ProtectedRoute>} />
+          <Route path="/nimda/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="/nimda/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+          <Route path="/nimda/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

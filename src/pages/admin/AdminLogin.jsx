@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import { Button } from '../../components/ui/button'
 import { useToast } from '../../hooks/use-toast'
-import { loginAdmin } from '../../lib/firebase-service'
+import { loginUser } from '../../lib/auth-service'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("")
@@ -19,26 +19,20 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      const isValid = await loginAdmin(email, password)
+      const user = await loginUser(email, password)
 
-      if (isValid) {
-        localStorage.setItem("adminAuth", "true")
+      if (user) {
         toast({
           title: "Login Successful",
-          description: "Welcome to the admin panel",
+          description: `Welcome back, ${user.name}!`,
         })
         navigate("/nimda/dashboard")
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password",
-          variant: "destructive",
-        })
       }
     } catch (error) {
+      console.error("Login error:", error)
       toast({
-        title: "Error",
-        description: "An error occurred during login",
+        title: "Login Failed",
+        description: error.message || "Invalid email or password. Please check your credentials.",
         variant: "destructive",
       })
     } finally {

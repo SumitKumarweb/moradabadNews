@@ -3,11 +3,13 @@ import { useTheme } from "../theme-provider"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../ui/button"
 import { useToast } from "../../hooks/use-toast"
+import { logoutUser, getCurrentUser } from "../../lib/auth-service"
 
 export default function AdminHeader() {
   const { setTheme, theme } = useTheme()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const currentUser = getCurrentUser()
 
   const toggleTheme = () => {
     // Get current effective theme
@@ -20,7 +22,7 @@ export default function AdminHeader() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("adminAuth")
+    logoutUser()
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of the admin panel",
@@ -31,7 +33,14 @@ export default function AdminHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
       <div className="flex items-center gap-4">
-        <h2 className="text-lg font-semibold text-foreground">Admin Panel</h2>
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Admin Panel</h2>
+          {currentUser && (
+            <p className="text-xs text-muted-foreground">
+              Welcome, {currentUser.name}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

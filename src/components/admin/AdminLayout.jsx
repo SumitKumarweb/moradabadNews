@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import AdminSidebar from "./AdminSidebar"
 import AdminHeader from "./AdminHeader"
+import { getCurrentUser } from "../../lib/auth-service"
 
 export default function AdminLayout({ children }) {
   const navigate = useNavigate()
@@ -11,11 +12,11 @@ export default function AdminLayout({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check authentication
-    const auth = localStorage.getItem("adminAuth")
-    if (!auth && pathname !== "/nimda") {
+    // Check authentication using new auth service
+    const user = getCurrentUser()
+    if (!user && pathname !== "/nimda") {
       navigate("/nimda")
-    } else {
+    } else if (user) {
       setIsAuthenticated(true)
     }
     setLoading(false)
