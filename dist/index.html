@@ -40,13 +40,27 @@
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#2563eb" />
     <link rel="canonical" href="https://moradabads.com/" />
-    <script type="module" crossorigin src="/assets/index-BS4lTfSh.js"></script>
+    <script type="module" crossorigin src="/assets/index-CCKK_DMp.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/react-vendor-DwyeZy32.js">
-    <link rel="modulepreload" crossorigin href="/assets/ui-Cn-zCv2m.js">
+    <link rel="modulepreload" crossorigin href="/assets/ui-BIscv6i2.js">
     <link rel="modulepreload" crossorigin href="/assets/firebase-etGlLq9I.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-Bzb84TOu.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BUb5U0nU.css">
   </head>
   <body>
+    <script>
+      // Apply theme before React loads to prevent flash
+      (function() {
+        const theme = localStorage.getItem('moradabad-news-theme') || 'light';
+        const root = document.documentElement;
+        
+        if (theme === 'system') {
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          root.classList.add(systemTheme);
+        } else {
+          root.classList.add(theme);
+        }
+      })();
+    </script>
     <div id="root"></div>
   </body>
 </html>
