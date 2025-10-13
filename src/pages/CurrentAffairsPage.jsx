@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { SiteHeader } from "../components/SiteHeader"
 import { SiteFooter } from "../components/SiteFooter"
+import SEO from "../components/SEO"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
@@ -109,6 +110,11 @@ export default function CurrentAffairsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO
+        title="Current Affairs Quiz"
+        description="Test your knowledge of current events and affairs with our interactive quiz. Stay updated and challenge yourself with the latest current affairs questions."
+        keywords="current affairs quiz, current events quiz, general knowledge, quiz, test knowledge, current affairs"
+      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

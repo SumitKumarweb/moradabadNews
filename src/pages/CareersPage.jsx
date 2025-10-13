@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
+import SEO from '../components/SEO'
 import { getActiveJobs } from '../lib/firebase-service'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
@@ -45,6 +46,11 @@ export default function CareersPage() {
 
   return (
     <>
+      <SEO
+        title="Careers"
+        description="Join Moradabad's leading news organization. Explore career opportunities at Moradabad News and grow with us. Be part of our team."
+        keywords="careers, jobs, Moradabad News jobs, journalism careers, media jobs, job opportunities"
+      />
       <SiteHeader />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">

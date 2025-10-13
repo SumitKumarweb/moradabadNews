@@ -3,6 +3,7 @@ import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
+import SEO from '../components/SEO'
 import { getTrendingArticles } from '../lib/firebase-service'
 import { TrendingUp } from 'lucide-react'
 
@@ -21,6 +22,11 @@ export default function TrendingNewsPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO
+        title="Trending News"
+        description="Most popular and trending stories right now. Stay updated with the hottest news from Moradabad, UP, India and around the world."
+        keywords="trending news, popular news, viral news, hot news, most viewed news"
+      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

@@ -1,6 +1,7 @@
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
+import SEO from '../components/SEO'
 import { ContactForm } from '../components/ContactForm'
 import { Card, CardContent } from '../components/ui/card'
 import { Mail, Phone, MapPin, Clock } from 'lucide-react'
@@ -8,6 +9,11 @@ import { Mail, Phone, MapPin, Clock } from 'lucide-react'
 export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO
+        title="Contact Us"
+        description="Have a question, feedback, or news tip? Get in touch with Moradabad News team. We'd love to hear from you."
+        keywords="contact Moradabad News, feedback, news tips, get in touch, contact form"
+      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

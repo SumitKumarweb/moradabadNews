@@ -6,6 +6,7 @@ import { TrendingNews } from '../components/TrendingNews'
 import { NewsByCategory } from '../components/NewsByCategory'
 import { VideoSection } from '../components/VideoSection'
 import { HeaderBanner } from '../components/HeaderBanner'
+import SEO from '../components/SEO'
 import { 
   getFeaturedArticles, 
   getTrendingArticles,
@@ -73,6 +74,7 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO />
       {headerBanners.length > 0 && <HeaderBanner banners={headerBanners} />}
       <SiteHeader />
       <main className="flex-1">

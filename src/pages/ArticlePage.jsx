@@ -4,6 +4,7 @@ import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
+import SEO from '../components/SEO'
 import {
   getArticleById,
   getRecommendedArticles,
@@ -101,6 +102,15 @@ export default function ArticlePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO
+        title={article.metaTitle || article.title}
+        description={article.metaDescription || article.summary}
+        keywords={article.metaKeywords?.join(', ') || article.tags?.join(', ')}
+        image={article.ogImage || article.image}
+        type="article"
+        author={article.author}
+        publishedTime={article.publishedAt}
+      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

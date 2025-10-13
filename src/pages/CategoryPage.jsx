@@ -4,6 +4,7 @@ import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
+import SEO from '../components/SEO'
 import { getArticlesByCategory } from '../lib/firebase-service'
 import { Loader2 } from 'lucide-react'
 
@@ -65,6 +66,11 @@ export default function CategoryPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO
+        title={categoryName}
+        description={`Latest updates and breaking stories from ${categoryName.toLowerCase()}. Stay informed with the most recent news and developments.`}
+        keywords={`${categoryName}, latest news, breaking news, updates, ${category} news`}
+      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
