@@ -9,7 +9,6 @@ import { HeaderBanner } from '../components/HeaderBanner'
 import SEO from '../components/SEO'
 import StaticSEO from '../components/SEO/StaticSEO'
 import LocalSEO from '../components/LocalSEO'
-import AccessibilityEnhancements from '../components/AccessibilityEnhancements'
 import useAnalytics from '../hooks/use-analytics'
 import googleAnalytics from '../lib/google-analytics'
 import performanceOptimizer from '../lib/performance-optimization'
@@ -151,14 +150,13 @@ export default function HomePage() {
         tags={["Moradabad", "UP", "India", "breaking news", "current affairs"]}
       />
       <LocalSEO />
-      <AccessibilityEnhancements />
       
       {headerBanners.length > 0 && <HeaderBanner banners={headerBanners} />}
       <SiteHeader />
       
       <main className="flex-1" id="main-content">
-        {/* Hero Section with Featured News */}
-        {featuredArticles.length > 0 && <HeroSection articles={featuredArticles} />}
+        {/* Hero Section with Featured and Recent News */}
+        <HeroSection articles={[...featuredArticles, ...trendingArticles]} />
 
         {/* Statistics Section */}
         <section className="bg-gradient-to-r from-primary/5 to-secondary/5 py-16">
