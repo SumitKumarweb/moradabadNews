@@ -33,6 +33,11 @@ export function SiteFooter() {
                   Sitemap
                 </a>
               </li>
+              <li>
+                <a href="/services" className="text-muted-foreground hover:text-foreground">
+                  Services
+                </a>
+              </li>
             </ul>
           </div>
 

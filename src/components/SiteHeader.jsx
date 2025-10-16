@@ -13,6 +13,7 @@ const navItems = [
   { name: "India News", to: "/news/india", keywords: "India breaking news, national news" },
   { name: "Global News", to: "/news/global", keywords: "world news, international news" },
   { name: "Current Affairs", to: "/current-affairs", keywords: "current affairs, trending topics" },
+  { name: "Services", to: "/services", keywords: "digital services, library management, business solutions" },
   { name: "Careers", to: "/careers", keywords: "jobs Moradabad, career opportunities" },
   { name: "About", to: "/about", keywords: "about Moradabad News, our mission" },
   { name: "Contact", to: "/contact", keywords: "contact us, get in touch" },

@@ -14,6 +14,7 @@ import {
   Megaphone,
   BarChart3,
   UserCog,
+  Library,
 } from "lucide-react"
 import { getCurrentUser, ROLES } from "@/lib/auth-service"
 
@@ -77,6 +78,12 @@ const allNavItems = [
     title: "Analytics",
     to: "/nimda/analytics",
     icon: BarChart3,
+    roles: [ROLES.MASTER], // Only master
+  },
+  {
+    title: "Services",
+    to: "/nimda/services",
+    icon: Library,
     roles: [ROLES.MASTER], // Only master
   },
   {

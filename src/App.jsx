@@ -7,6 +7,7 @@ import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import CareersPage from './pages/CareersPage'
 import ContactPage from './pages/ContactPage'
+import ServicesPage from './pages/ServicesPage'
 import CurrentAffairsPage from './pages/CurrentAffairsPage'
 import TrendingNewsPage from './pages/TrendingNewsPage'
 import CategoryPage from './pages/CategoryPage'
@@ -27,6 +28,7 @@ import AdminHeaders from './pages/admin/AdminHeaders'
 import AdminVideos from './pages/admin/AdminVideos'
 import AdminQuiz from './pages/admin/AdminQuiz'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminServices from './pages/admin/AdminServices'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminUsers from './pages/admin/AdminUsers'
 
@@ -43,6 +45,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/services" element={<ServicesPage />} />
           <Route path="/current-affairs" element={<CurrentAffairsPage />} />
           <Route path="/news/trending" element={<TrendingNewsPage />} />
           <Route path="/news/:category" element={<CategoryPage />} />
@@ -62,6 +65,7 @@ function App() {
           <Route path="/nimda/videos" element={<ProtectedRoute><AdminVideos /></ProtectedRoute>} />
           <Route path="/nimda/quiz" element={<ProtectedRoute><AdminQuiz /></ProtectedRoute>} />
           <Route path="/nimda/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="/nimda/services" element={<ProtectedRoute><AdminServices /></ProtectedRoute>} />
           <Route path="/nimda/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
           <Route path="/nimda/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
 
