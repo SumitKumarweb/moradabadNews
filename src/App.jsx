@@ -11,6 +11,7 @@ import CurrentAffairsPage from './pages/CurrentAffairsPage'
 import TrendingNewsPage from './pages/TrendingNewsPage'
 import CategoryPage from './pages/CategoryPage'
 import ArticlePage from './pages/ArticlePage'
+import SearchPage from './pages/SearchPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Admin Pages
@@ -45,6 +46,7 @@ function App() {
           <Route path="/news/trending" element={<TrendingNewsPage />} />
           <Route path="/news/:category" element={<CategoryPage />} />
           <Route path="/news/:category/:id" element={<ArticlePage />} />
+          <Route path="/search" element={<SearchPage />} />
 
           {/* Admin Routes */}
           <Route path="/nimda" element={<AdminLogin />} />

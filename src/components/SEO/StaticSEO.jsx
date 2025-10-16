@@ -1,6 +1,7 @@
+// Static SEO component for server-side rendering
 import { Helmet } from 'react-helmet-async'
 
-export default function SEO({
+export default function StaticSEO({
   title,
   description,
   keywords,
@@ -22,64 +23,13 @@ export default function SEO({
 }) {
   const siteName = 'Moradabad News'
   const siteUrl = 'https://moradabadnews.com'
-  
-  // Enhanced keyword research for Moradabad news niche
-  const primaryKeywords = [
-    'Moradabad news',
-    'Moradabad latest news',
-    'Moradabad breaking news',
-    'UP news',
-    'Uttar Pradesh news',
-    'Moradabad current affairs',
-    'Moradabad local news',
-    'Moradabad city news'
-  ]
-  
-  const secondaryKeywords = [
-    'India news',
-    'Hindi news',
-    'breaking news India',
-    'current affairs',
-    'trending news',
-    'latest news today',
-    'news Moradabad UP',
-    'Moradabad updates'
-  ]
-  
-  const localKeywords = [
-    'Moradabad weather',
-    'Moradabad traffic',
-    'Moradabad events',
-    'Moradabad business news',
-    'Moradabad politics',
-    'Moradabad sports news',
-    'Moradabad education news'
-  ]
-  
-  const defaultDescription = 'Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories. Your trusted source for Moradabad local news.'
-  const defaultKeywords = [...primaryKeywords, ...secondaryKeywords, ...localKeywords].join(', ')
-  const defaultImage = '/favicon.svg'
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : siteUrl
-
-  // Optimize title length (under 60 characters)
-  const finalTitle = title ? 
-    (title.length > 50 ? `${title} - ${siteName}` : `${title} | ${siteName}`) : 
-    `${siteName} - Latest News from Moradabad, UP, India & World`
-  
-  // Optimize description length (under 160 characters)
-  const finalDescription = description || defaultDescription
-  const optimizedDescription = finalDescription.length > 155 ? 
-    finalDescription.substring(0, 152) + '...' : 
-    finalDescription
-    
-  const finalKeywords = keywords || defaultKeywords
-  const finalImage = image || defaultImage
   const finalUrl = url || (typeof window !== 'undefined' ? window.location.href : siteUrl)
+  const finalImage = image || '/images/og-default.jpg'
   const absoluteImage = finalImage.startsWith('http') ? finalImage : `${baseUrl}${finalImage}`
 
-  // Generate structured data for better SEO
+  // Generate structured data
   const generateStructuredData = () => {
-    // If custom structured data is provided, use it
     if (structuredData) {
       return Array.isArray(structuredData) ? structuredData : [structuredData]
     }
@@ -89,7 +39,7 @@ export default function SEO({
       "@type": "WebSite",
       "name": siteName,
       "url": siteUrl,
-      "description": optimizedDescription,
+      "description": description,
       "publisher": {
         "@type": "Organization",
         "name": siteName,
@@ -111,7 +61,7 @@ export default function SEO({
         "@context": "https://schema.org",
         "@type": "NewsArticle",
         "headline": title,
-        "description": optimizedDescription,
+        "description": description,
         "image": absoluteImage,
         "author": {
           "@type": "Person",
@@ -140,14 +90,25 @@ export default function SEO({
   return (
     <Helmet>
       {/* Basic Meta Tags */}
-      <title>{finalTitle}</title>
-      <meta name="description" content={optimizedDescription} />
-      <meta name="keywords" content={finalKeywords} />
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
       <meta name="author" content={author || siteName} />
       <meta name="robots" content={noindex ? "noindex,nofollow" : "index,follow"} />
       <meta name="googlebot" content="index,follow" />
       <meta name="language" content="en" />
       <meta name="revisit-after" content="1 days" />
+      
+      {/* Additional Meta Tags for Better SEO */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="format-detection" content="telephone=no" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content={siteName} />
+      <meta name="application-name" content={siteName} />
+      <meta name="msapplication-TileColor" content="#1e40af" />
+      <meta name="theme-color" content="#1e40af" />
       
       {/* Geographic Meta Tags for Local SEO */}
       <meta name="geo.region" content="IN-UP" />
@@ -158,8 +119,8 @@ export default function SEO({
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
       <meta property="og:url" content={finalUrl} />
-      <meta property="og:title" content={finalTitle} />
-      <meta property="og:description" content={optimizedDescription} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
       <meta property="og:image" content={absoluteImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -175,8 +136,8 @@ export default function SEO({
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:url" content={finalUrl} />
-      <meta name="twitter:title" content={finalTitle} />
-      <meta name="twitter:description" content={optimizedDescription} />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={absoluteImage} />
       <meta name="twitter:site" content="@moradabadnews" />
       <meta name="twitter:creator" content="@moradabadnews" />
@@ -200,4 +161,3 @@ export default function SEO({
     </Helmet>
   )
 }
-
