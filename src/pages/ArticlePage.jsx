@@ -9,9 +9,11 @@ import StaticSEO from '../components/SEO/StaticSEO'
 import useAnalytics from '../hooks/use-analytics'
 import {
   getArticleById,
+  getArticlesByCategory,
   getRecommendedArticles,
   incrementArticleViews,
 } from '../lib/firebase-service'
+import { generateSlug, generateSlugWithTransliteration, extractIdFromSlug } from '../lib/utils'
 import { Loader2, Calendar, User, Eye } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -23,8 +25,34 @@ const categoryNames = {
   "current-affairs": "Current Affairs",
 }
 
+// Function to find article by slug
+async function findArticleBySlug(slug, category) {
+  try {
+    // First, try to extract ID from slug (for backward compatibility)
+    const extractedId = extractIdFromSlug(slug)
+    if (extractedId) {
+      const article = await getArticleById(extractedId)
+      if (article && article.category === category) {
+        return article
+      }
+    }
+    
+    // If no ID found or article doesn't match, search by slug
+    const articles = await getArticlesByCategory(category)
+    const targetSlug = generateSlug(slug)
+    
+    return articles.find(article => {
+      const articleSlug = generateSlug(article.title)
+      return articleSlug === targetSlug
+    })
+  } catch (error) {
+    console.error("Error finding article by slug:", error)
+    return null
+  }
+}
+
 export default function ArticlePage() {
-  const { category, id } = useParams()
+  const { category, slug } = useParams()
   const [article, setArticle] = useState(null)
   const [recommendedArticles, setRecommendedArticles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -44,7 +72,7 @@ export default function ArticlePage() {
       if (!isMounted) return
       setLoading(true)
       try {
-        const articleData = await getArticleById(id)
+        const articleData = await findArticleBySlug(slug, category)
 
         if (!isMounted) return
 
@@ -55,9 +83,9 @@ export default function ArticlePage() {
         }
 
         setArticle(articleData)
-        incrementArticleViews(id)
+        incrementArticleViews(articleData.id)
 
-        const recommended = await getRecommendedArticles(id, category)
+        const recommended = await getRecommendedArticles(articleData.id, category)
 
         if (isMounted) {
           setRecommendedArticles(recommended)
@@ -72,14 +100,14 @@ export default function ArticlePage() {
       }
     }
 
-    if (category && id) {
+    if (category && slug) {
       loadData()
     }
 
     return () => {
       isMounted = false
     }
-  }, [category, id])
+  }, [category, slug])
 
   if (loading) {
     return (
@@ -90,7 +118,7 @@ export default function ArticlePage() {
           description="Loading the latest news article from Moradabad News. Stay updated with breaking news and current affairs."
           keywords="Moradabad news, loading, latest news, breaking news"
           type="website"
-          url={`/news/${category}/${id}`}
+          url={`/news/${category}/${slug}`}
         />
         <SiteHeader />
         <main className="flex-1 flex items-center justify-center">
@@ -133,7 +161,7 @@ export default function ArticlePage() {
           modifiedTime={article.modifiedAt}
           category={article.category}
           tags={article.tags}
-          url={`/news/${category}/${id}`}
+          url={`/news/${category}/${slug}`}
         />
       )}
       
@@ -143,7 +171,7 @@ export default function ArticlePage() {
         breadcrumbs={[
           { name: "Home", url: "/" },
           { name: categoryName, url: `/news/${category}` },
-          { name: article.title, url: `/news/${category}/${id}` }
+          { name: article.title, url: `/news/${category}/${slug}` }
         ]}
       />
       <SiteHeader />

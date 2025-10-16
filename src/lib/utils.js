@@ -40,9 +40,52 @@ export function truncateText(text, maxLength = 100) {
 export function generateSlug(text) {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
+    // Keep Unicode letters (including Hindi, Arabic, Chinese, etc.) and basic punctuation
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim()
+}
+
+// Enhanced slug generation with transliteration support for Hindi
+export function generateSlugWithTransliteration(text) {
+  // Hindi to English transliteration mapping
+  const transliterationMap = {
+    'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo', 'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au',
+    'क': 'k', 'ख': 'kh', 'ग': 'g', 'घ': 'gh', 'ङ': 'ng', 'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ञ': 'ny',
+    'ट': 't', 'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'ण': 'n', 'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh', 'न': 'n',
+    'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm', 'य': 'y', 'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh',
+    'ष': 'sh', 'स': 's', 'ह': 'h', 'क्ष': 'ksh', 'त्र': 'tr', 'ज्ञ': 'gya',
+    'ा': 'a', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo', 'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au', 'ं': 'n', 'ः': 'h'
+  }
+  
+  let result = text.toLowerCase()
+  
+  // Apply transliteration for Hindi characters
+  for (const [hindi, english] of Object.entries(transliterationMap)) {
+    result = result.replace(new RegExp(hindi, 'g'), english)
+  }
+  
+  // Clean up the result
+  return result
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+}
+
+export function generateArticleUrl(article) {
+  const slug = generateSlug(article.title)
+  return `/news/${article.category}/${slug}`
+}
+
+export function extractIdFromSlug(slug) {
+  // For backward compatibility, if slug contains an ID pattern, extract it
+  // This handles cases where the slug might be in format "title-of-article-id123"
+  const idMatch = slug.match(/-(\w+)$/)
+  if (idMatch) {
+    return idMatch[1]
+  }
+  return null
 }
 

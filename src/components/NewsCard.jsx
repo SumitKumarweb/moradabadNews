@@ -3,11 +3,12 @@ import { Clock, Eye } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
+import { generateArticleUrl } from "../lib/utils"
 
 export function NewsCard({ article, compact = false }) {
   return (
     <Card className="group overflow-hidden transition-shadow hover:shadow-lg">
-      <Link to={`/news/${article.category}/${article.id}`}>
+      <Link to={generateArticleUrl(article)}>
         <CardHeader className="p-0">
           <div className={`relative overflow-hidden ${compact ? "h-48" : "h-56"}`}>
             <img

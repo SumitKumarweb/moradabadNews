@@ -13,6 +13,7 @@ import StaticSEO from '../components/SEO/StaticSEO'
 import { useSearchWithFilters } from '../hooks/use-search'
 import searchService from '../lib/search-service'
 import { format } from 'date-fns'
+import { generateArticleUrl } from '../lib/utils'
 
 // Search results will be fetched dynamically from Firebase via search service
 
@@ -272,7 +273,7 @@ export default function SearchPage() {
                                 </div>
                                 
                                 <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                                  <Link to={`/news/${result.category}/${result.id}`}>
+                                  <Link to={generateArticleUrl(result)}>
                                     {result.title}
                                   </Link>
                                 </h3>

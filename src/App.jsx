@@ -45,7 +45,7 @@ function App() {
           <Route path="/current-affairs" element={<CurrentAffairsPage />} />
           <Route path="/news/trending" element={<TrendingNewsPage />} />
           <Route path="/news/:category" element={<CategoryPage />} />
-          <Route path="/news/:category/:id" element={<ArticlePage />} />
+          <Route path="/news/:category/:slug" element={<ArticlePage />} />
           <Route path="/search" element={<SearchPage />} />
 
           {/* Admin Routes */}

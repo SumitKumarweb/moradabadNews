@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatDistanceToNow } from "date-fns"
+import { generateArticleUrl } from "../lib/utils"
 
 export function HeroSection({ articles }) {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -51,7 +52,7 @@ export function HeroSection({ articles }) {
             <span>{formatDistanceToNow(new Date(currentArticle.publishedAt), { addSuffix: true })}</span>
           </div>
 
-          <Link to={`/news/${currentArticle.category}/${currentArticle.id}`}>
+          <Link to={generateArticleUrl(currentArticle)}>
             <h1 className="font-serif text-3xl font-bold leading-tight text-white md:text-5xl hover:text-white/90 transition-colors">
               {currentArticle.title}
             </h1>
@@ -60,7 +61,7 @@ export function HeroSection({ articles }) {
           <p className="text-lg leading-relaxed text-white/90 line-clamp-2">{currentArticle.summary}</p>
 
           <div className="flex items-center gap-4">
-            <Link to={`/news/${currentArticle.category}/${currentArticle.id}`}>
+            <Link to={generateArticleUrl(currentArticle)}>
               <Button size="lg" className="bg-primary hover:bg-primary/90">
                 Read More
               </Button>
