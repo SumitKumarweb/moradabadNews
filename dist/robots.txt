@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Sitemap
 Sitemap: https://moradabadnews.com/sitemap.xml
+
+# Disallow admin areas
+Disallow: /nimda/
+Disallow: /admin/
+Disallow: /api/
