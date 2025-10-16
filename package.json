@@ -9,7 +9,7 @@
     "generate-sitemap": "node scripts/generate-sitemap.js",
     "test-schema": "node scripts/test-schema.js",
     "build:with-sitemap": "npm run generate-sitemap && vite build",
-    "deploy:build": "npm run build:with-sitemap && tar -czf hostinger-deployment.tar.gz -C dist ."
+    "deploy:build": "npm run build:with-sitemap && tar -czf hostinger-deployment.tar.gz -C public_html ."
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.2",
