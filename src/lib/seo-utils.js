@@ -6,7 +6,12 @@ export const SITE_CONFIG = {
   name: 'Moradabad News',
   url: 'https://moradabadnews.com',
   description: 'Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories.',
-  defaultImage: '/images/og-default.jpg',
+  defaultImage: '/logo.svg',
+  logo: {
+    url: '/logo.svg',
+    width: 200,
+    height: 60
+  },
   twitterHandle: '@moradabadnews',
   facebookAppId: '123456789', // Replace with actual Facebook App ID
   googleAnalyticsId: 'G-7MDBN4HRGB', // Replace with actual GA ID
@@ -210,7 +215,9 @@ export function generateStructuredData(data, pageType = 'article') {
           "url": SITE_CONFIG.url,
           "logo": {
             "@type": "ImageObject",
-            "url": `${baseUrl}/favicon.svg`
+            "url": `${baseUrl}/logo.svg`,
+            "width": 200,
+            "height": 60
           }
         },
         "datePublished": data.publishedAt,
@@ -259,7 +266,9 @@ export function generateStructuredData(data, pageType = 'article') {
           "url": SITE_CONFIG.url,
           "logo": {
             "@type": "ImageObject",
-            "url": `${baseUrl}/favicon.svg`
+            "url": `${baseUrl}/logo.svg`,
+            "width": 200,
+            "height": 60
           }
         },
         "potentialAction": {

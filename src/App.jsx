@@ -12,6 +12,7 @@ import TrendingNewsPage from './pages/TrendingNewsPage'
 import CategoryPage from './pages/CategoryPage'
 import ArticlePage from './pages/ArticlePage'
 import SearchPage from './pages/SearchPage'
+import SitemapPage from './pages/SitemapPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Admin Pages
@@ -47,6 +48,7 @@ function App() {
           <Route path="/news/:category" element={<CategoryPage />} />
           <Route path="/news/:category/:slug" element={<ArticlePage />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/sitemap.xml" element={<SitemapPage />} />
 
           {/* Admin Routes */}
           <Route path="/nimda" element={<AdminLogin />} />

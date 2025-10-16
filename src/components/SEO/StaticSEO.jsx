@@ -46,7 +46,9 @@ export default function StaticSEO({
         "url": siteUrl,
         "logo": {
           "@type": "ImageObject",
-          "url": `${baseUrl}/favicon.svg`
+          "url": `${baseUrl}/logo.svg`,
+          "width": 200,
+          "height": 60
         }
       },
       "potentialAction": {
@@ -72,7 +74,9 @@ export default function StaticSEO({
           "name": siteName,
           "logo": {
             "@type": "ImageObject",
-            "url": `${baseUrl}/favicon.svg`
+            "url": `${baseUrl}/logo.svg`,
+            "width": 200,
+            "height": 60
           }
         },
         "datePublished": publishedTime,

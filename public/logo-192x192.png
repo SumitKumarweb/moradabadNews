@@ -1,0 +1,10 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" fill="#1e40af" rx="24"/>
+  <rect x="48" y="48" width="96" height="96" fill="white" rx="12"/>
+  <rect x="60" y="60" width="72" height="8" fill="#1e40af"/>
+  <rect x="60" y="75" width="54" height="8" fill="#1e40af"/>
+  <rect x="60" y="90" width="66" height="8" fill="#1e40af"/>
+  <rect x="60" y="105" width="42" height="8" fill="#1e40af"/>
+  <text x="96" y="140" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white" text-anchor="middle">Moradabad</text>
+  <text x="96" y="160" font-family="Arial, sans-serif" font-size="14" fill="#e5e7eb" text-anchor="middle">News</text>
+</svg>

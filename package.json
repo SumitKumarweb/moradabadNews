@@ -6,7 +6,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy:build": "vite build && tar -czf hostinger-deployment.tar.gz -C dist ."
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "test-schema": "node scripts/test-schema.js",
+    "build:with-sitemap": "npm run generate-sitemap && vite build",
+    "deploy:build": "npm run build:with-sitemap && tar -czf hostinger-deployment.tar.gz -C dist ."
   },
   "dependencies": {
     "@radix-ui/react-accordion": "1.2.2",
