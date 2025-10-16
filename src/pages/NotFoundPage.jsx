@@ -75,7 +75,7 @@ export default function NotFoundPage() {
                 <Link to="/contact" className="text-sm hover:text-primary transition-colors">
                   Contact
                 </Link>
-                <Link to="/services" className="text-sm hover:text-primary transition-colors">Services</Link>
+                <Link to="/services" className="text-sm hover:text-primary transition-colors">new Services</Link>
               </div>
             </div>
           </div>
