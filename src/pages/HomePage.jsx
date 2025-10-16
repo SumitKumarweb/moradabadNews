@@ -156,27 +156,41 @@ export default function HomePage() {
       
       <main className="flex-1" id="main-content">
         {/* Hero Section with Featured and Recent News */}
-        <HeroSection articles={[...featuredArticles, ...trendingArticles]} />
+        <HeroSection articles={[...featuredArticles, ...trendingArticles]} exculdeTrendingArticle={[ ...moradabadNews , ...upNews , ...indiaNews , ...globalNews]}/>
+ 
 
-        {/* Statistics Section */}
-        <section className="bg-gradient-to-r from-primary/5 to-secondary/5 py-16">
+        {/* Enhanced Statistics Section */}
+        <section className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 py-16">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">50K+</div>
-                <div className="text-sm text-muted-foreground">Daily Readers</div>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Moradabad News in Numbers</h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300">Your trusted source for local and regional news</p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+              <div className="text-center group">
+                <div className="bg-white dark:bg-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 group-hover:scale-105">
+                  <div className="text-4xl font-bold text-red-600 dark:text-red-400 mb-2">50K+</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 font-medium">Daily Readers</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">100+</div>
-                <div className="text-sm text-muted-foreground">Articles Daily</div>
+              <div className="text-center group">
+                <div className="bg-white dark:bg-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 group-hover:scale-105">
+                  <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">100+</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 font-medium">Articles Daily</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-                <div className="text-sm text-muted-foreground">News Updates</div>
+              <div className="text-center group">
+                <div className="bg-white dark:bg-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 group-hover:scale-105">
+                  <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">24/7</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 font-medium">News Updates</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">5+</div>
-                <div className="text-sm text-muted-foreground">Years Experience</div>
+              <div className="text-center group">
+                <div className="bg-white dark:bg-slate-700 rounded-2xl p-6 shadow-lg hover:shadow-xl dark:shadow-slate-900/50 transition-all duration-300 group-hover:scale-105">
+                  <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">5+</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 font-medium">Years Experience</div>
+                </div>
               </div>
             </div>
           </div>
@@ -255,8 +269,7 @@ export default function HomePage() {
               <input 
                 type="email" 
                 placeholder="Enter your email address" 
-                className="flex-1 px-4 py-3 rounded-lg text-foreground"
-                style={{ color: 'black' }}
+                className="flex-1 px-4 py-3 rounded-lg text-foreground bg-background/10 border border-primary-foreground/20 placeholder:text-primary-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
               />
               <Button variant="secondary" size="lg" className="whitespace-nowrap">
                 Subscribe Now
@@ -266,18 +279,18 @@ export default function HomePage() {
         </section>
 
         {/* Local SEO Content */}
-        <section className="py-16 bg-muted/30">
+        <section className="py-16 bg-muted/30 dark:bg-slate-800/50">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8">
-              <Card>
+              <Card className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
                     <MapPin className="h-5 w-5 text-primary" />
                     About Moradabad
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
+                  <p className="text-muted-foreground dark:text-slate-300">
                     Moradabad, known as the "Brass City of India," is a major industrial and commercial center in Uttar Pradesh. 
                     Our news coverage includes local politics, business developments, cultural events, and community updates 
                     that matter to the residents of Moradabad and surrounding areas.
@@ -285,21 +298,21 @@ export default function HomePage() {
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
                     <Newspaper className="h-5 w-5 text-primary" />
                     Our Coverage
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Badge variant="secondary">Local Politics</Badge>
-                    <Badge variant="secondary">Business News</Badge>
-                    <Badge variant="secondary">Education</Badge>
-                    <Badge variant="secondary">Health</Badge>
-                    <Badge variant="secondary">Sports</Badge>
-                    <Badge variant="secondary">Culture</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Local Politics</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Business News</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Education</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Health</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Sports</Badge>
+                    <Badge variant="secondary" className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200">Culture</Badge>
                   </div>
                 </CardContent>
               </Card>

@@ -1,289 +1,309 @@
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { ChevronLeft, ChevronRight, Play, Pause, Sparkles, TrendingUp, Clock, User, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { formatDistanceToNow } from "date-fns"
-import { generateArticleUrl } from "../lib/utils"
 
-export function HeroSection({ articles }) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { Clock, Eye, TrendingUp, Star, ArrowRight, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Card } from './ui/card'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { formatDistanceToNow } from 'date-fns'
+import { generateArticleUrl } from '../lib/utils'
+
+export function HeroSection({ articles , exculdeTrendingArticle}) {
+  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isHovered, setIsHovered] = useState(false)
 
-  // Filter and sort articles based on featured status and recency
-  const getDisplayArticles = () => {
-    const now = new Date()
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-    
-    return articles
-      .filter(article => {
-        const publishedDate = new Date(article.publishedAt)
-        
-        // If article is featured, only show if published within last 24 hours
-        if (article.isFeatured) {
-          return publishedDate >= twentyFourHoursAgo
-        }
-        
-        // Show all non-featured recent articles
-        return true
-      })
-      .sort((a, b) => {
-        // Featured articles first (if within 24 hours)
-        if (a.isFeatured && !b.isFeatured) return -1
-        if (!a.isFeatured && b.isFeatured) return 1
-        
-        // Then sort by most recent
-        return new Date(b.publishedAt) - new Date(a.publishedAt)
-      })
-  }
+  console.log(articles , 'articles')
 
-  const displayArticles = getDisplayArticles()
-
-  // Debug logging
+  // Separate featured and latest articles
+  const featuredArticles = articles.filter(article => article.isFeatured).slice(0, 3)
+  const latestArticles = articles
+    .filter(article => !article.isFeatured)
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+    .slice(0, 6)
+  const moradabadNewsExculdeTrending =  exculdeTrendingArticle
+  .filter(article => !article.isFeatured && !article.isTrending)
+  
+  // Auto-rotate featured articles
   useEffect(() => {
-    console.log('HeroSection - Total articles:', articles.length)
-    console.log('HeroSection - Display articles:', displayArticles.length)
-    console.log('HeroSection - Featured articles:', articles.filter(a => a.isFeatured).length)
-    console.log('HeroSection - Recent articles:', articles.filter(a => !a.isFeatured).length)
-  }, [articles, displayArticles])
-
-  useEffect(() => {
-    if (displayArticles.length <= 1 || !isAutoPlaying) return
+    if (!isAutoPlaying || isHovered || featuredArticles.length <= 1) return
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % displayArticles.length)
-    }, 5000) // 5 seconds for better engagement
+      setCurrentFeaturedIndex((prev) => (prev + 1) % featuredArticles.length)
+    }, 5000)
 
     return () => clearInterval(interval)
-  }, [displayArticles.length, isAutoPlaying])
+  }, [isAutoPlaying, isHovered, featuredArticles.length])
 
-  // Reset index when articles change
-  useEffect(() => {
-    setCurrentIndex(0)
-  }, [displayArticles.length])
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + displayArticles.length) % displayArticles.length)
-    setIsAutoPlaying(false)
+  const handlePrev = () => {
+    setCurrentFeaturedIndex((prev) => 
+      prev === 0 ? featuredArticles.length - 1 : prev - 1
+    )
   }
 
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % displayArticles.length)
-    setIsAutoPlaying(false)
+  const handleNext = () => {
+    setCurrentFeaturedIndex((prev) => (prev + 1) % featuredArticles.length)
   }
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index)
-    setIsAutoPlaying(false)
+  const toggleAutoPlay = () => {
+    setIsAutoPlaying(!isAutoPlaying)
   }
 
-  // Touch gesture support
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0]
-    const startX = touch.clientX
-    const startY = touch.clientY
-    
-    const handleTouchEnd = (e) => {
-      const touch = e.changedTouches[0]
-      const endX = touch.clientX
-      const endY = touch.clientY
-      
-      const deltaX = endX - startX
-      const deltaY = endY - startY
-      
-      // Only trigger swipe if horizontal movement is greater than vertical
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-        if (deltaX > 0) {
-          goToPrevious()
-        } else {
-          goToNext()
-        }
-      }
-      
-      document.removeEventListener('touchend', handleTouchEnd)
-    }
-    
-    document.addEventListener('touchend', handleTouchEnd)
-  }
-
-  if (displayArticles.length === 0) {
+  if (articles.length === 0) {
     return (
-      <section className="relative w-full overflow-hidden bg-black">
-        <div className="relative h-[70vh] min-h-[400px] sm:h-[80vh] md:h-[90vh]">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-black" />
-          <div className="relative z-10 flex h-full items-center justify-center">
-            <div className="text-center px-4">
-              <h1 className="text-3xl font-bold text-white mb-4 sm:text-4xl md:text-5xl">
-                Welcome to Moradabad News
-              </h1>
-              <p className="text-lg text-white/80 mb-8">
-                Stay updated with the latest news and breaking stories
-              </p>
-              <div className="flex items-center justify-center gap-2 text-white/60">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">Loading latest content...</span>
-              </div>
-            </div>
-          </div>
+      <section className="relative min-h-[70vh] from-slate-900 to-slate-800 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-4xl font-bold mb-4">Moradabad News</h1>
+          <p className="text-xl opacity-90">Loading latest news...</p>
         </div>
       </section>
     )
   }
 
-  const currentArticle = displayArticles[currentIndex]
-
   return (
-    <section 
-      className="relative w-full overflow-hidden bg-black"
-      onTouchStart={handleTouchStart}
-    >
-      {/* Modern Background with Image */}
-      <div className="relative h-[70vh] min-h-[400px] sm:h-[80vh] md:h-[90vh]">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src={currentArticle.image || "/placeholder.svg?height=600&width=1200"}
-            alt={currentArticle.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-        </div>
+    <section className="relative min-h-[70vh]   from-gray-900  to-gray-800 overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
 
-        {/* Content Overlay */}
-        <div className="relative z-10 flex h-full items-end">
-          <div className="w-full px-4 pb-8 sm:px-6 sm:pb-12">
-            <div className="max-w-4xl">
-              {/* Status Badge */}
-              <div className="mb-4">
-                {currentArticle.isFeatured ? (
-                  <div className="inline-flex items-center gap-2 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white animate-pulse">
-                    <div className="h-2 w-2 rounded-full bg-white animate-ping"></div>
-                    FEATURED
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Main Featured Article */}
+          <div className="hidden md:block lg:col-span-2">
+            {featuredArticles.length > 0 && (
+              <div 
+                className="relative group"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <Card className="overflow-hidden border-0 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-500 group-hover:scale-[1.02] shadow-2xl">
+                  <div className="relative h-[500px] overflow-hidden">
+                    <img
+                      src={featuredArticles[currentFeaturedIndex]?.image || "/placeholder.svg?height=500&width=800"}
+                      alt={featuredArticles[currentFeaturedIndex]?.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    
+                    {/* Featured badge */}
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold px-3 py-1 shadow-lg">
+                        <Star className="w-4 h-4 mr-1" />
+                        Featured
+                      </Badge>
+                    </div>
+
+                    {/* Auto-play controls */}
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={toggleAutoPlay}
+                        className="bg-white/20 hover:bg-white/30 text-white border-0"
+                      >
+                        {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      </Button>
+                    </div>
+
+                    {/* Navigation arrows */}
+                    {featuredArticles.length > 1 && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={handlePrev}
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={handleNext}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+
+                    {/* Article content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge variant="outline" className="border-white/30 text-white bg-white/10">
+                          {featuredArticles[currentFeaturedIndex]?.category?.replace("-", " ")}
+                        </Badge>
+                        <span className="flex items-center gap-1 text-sm opacity-90">
+                          <Clock className="w-4 h-4" />
+                          {formatDistanceToNow(new Date(featuredArticles[currentFeaturedIndex]?.publishedAt), { addSuffix: true })}
+                        </span>
+                        <span className="flex items-center gap-1 text-sm opacity-90">
+                          <Eye className="w-4 h-4" />
+                          {featuredArticles[currentFeaturedIndex]?.views?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                      
+                      <Link to={generateArticleUrl(featuredArticles[currentFeaturedIndex])}>
+                        <h1 className="text-3xl lg:text-4xl font-bold mb-4 leading-tight group-hover:text-red-300 transition-colors duration-300">
+                          {featuredArticles[currentFeaturedIndex]?.title}
+                        </h1>
+                        <p className="text-lg opacity-90 mb-4 line-clamp-2">
+                          {featuredArticles[currentFeaturedIndex]?.summary}
+                        </p>
+                        <div className="flex items-center gap-2 text-white/80 group-hover:text-white transition-colors duration-300">
+                          <span>Read More</span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                        </div>
+                      </Link>
+                    </div>
                   </div>
-                ) : (
-                  <div className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-3 py-1 text-xs font-bold text-white">
-                    <TrendingUp className="h-3 w-3" />
-                    LATEST
+                </Card>
+
+                {/* Dots indicator */}
+                {featuredArticles.length > 1 && (
+                  <div className="flex justify-center mt-4 gap-2">
+                    {featuredArticles.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentFeaturedIndex(index)}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentFeaturedIndex 
+                            ? 'bg-white scale-125' 
+                            : 'bg-white/50 hover:bg-white/70'
+                        }`}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
-
-              {/* Title */}
-              <Link to={generateArticleUrl(currentArticle)} className="group block">
-                <h1 className="text-2xl font-bold leading-tight text-white transition-all duration-300 group-hover:text-blue-300 sm:text-3xl md:text-4xl lg:text-5xl">
-                  {currentArticle.title}
-                </h1>
-              </Link>
-
-              {/* Summary */}
-              <p className="mt-3 text-sm leading-relaxed text-white/80 line-clamp-2 sm:text-base sm:line-clamp-3 md:text-lg">
-                {currentArticle.summary}
-              </p>
-
-              {/* Author & Time */}
-              <div className="mt-4 flex items-center gap-4 text-xs text-white/60 sm:text-sm">
-                <div className="flex items-center gap-1">
-                  <User className="h-3 w-3" />
-                  <span>{currentArticle.author}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  <span>{formatDistanceToNow(new Date(currentArticle.publishedAt), { addSuffix: true })}</span>
-                </div>
-              </div>
-
-              {/* CTA Button */}
-              <div className="mt-6">
-                <Link to={generateArticleUrl(currentArticle)}>
-                  <Button 
-                    size="sm"
-                    className="bg-white text-black hover:bg-white/90 font-semibold transition-all duration-300 hover:scale-105"
-                  >
-                    Read Full Story
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+            )}
+            {/* Small News Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 mt-11">
+              {moradabadNewsExculdeTrending.slice(0, 3).map((article, index) => (
+                <Link key={article.id} to={generateArticleUrl(article)}>
+                  <Card className="group overflow-hidden border-0 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-[1.02] shadow-lg h-full">
+                    <div className="relative h-32 overflow-hidden">
+                      <img
+                        src={article.image || "/placeholder.svg?height=128&width=200"}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      {article.isTrending && (
+                        <Badge className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-xs px-2 py-1">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Trending
+                        </Badge>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    </div>
+                    
+                    <div className="p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          {article.category?.replace("-", " ")}
+                        </Badge>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                      
+                      <h3 className="font-semibold text-foreground text-sm leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                        {article.title}
+                      </h3>
+                      
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                        {article.summary}
+                      </p>
+                      
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>By {article.author}</span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {article.views?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
                 </Link>
-              </div>
+              ))}
+            </div>
+          </div>
+
+     
+
+          {/* Latest News Sidebar */}
+          <div className="space-y-4 md:col-span-1 lg:col-span-1">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl font-bold text-foreground">Latest News</h2>
+            </div>
+
+            {latestArticles.map((article, index) => (
+              <Link key={article.id} to={generateArticleUrl(article)}>
+                <Card className="group overflow-hidden border-0 bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300 hover:scale-[1.02] shadow-lg">
+                  <div className="flex gap-4 p-4">
+                    <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+                      <img
+                        src={article.image || "/placeholder.svg?height=80&width=80"}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      {article.isTrending && (
+                        <Badge className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-xs px-1 py-0">
+                          <TrendingUp className="w-3 h-3" />
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          {article.category?.replace("-", " ")}
+                        </Badge>
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                      
+                      <h3 className="font-semibold text-foreground text-sm leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                        {article.title}
+                      </h3>
+                      
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>By {article.author}</span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {article.views?.toLocaleString() || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+
+            {/* View All Latest News Button */}
+            <div className="pt-4">
+              <Link to="/news/moradabad">
+              <Button 
+                variant="outline" 
+                className="w-full"
+              >
+                  View All Moradabad News
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Modern Navigation Arrows */}
-      {displayArticles.length > 1 && (
-        <>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-300 sm:left-4 sm:h-12 sm:w-12"
-            onClick={goToPrevious}
-          >
-            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="sr-only">Previous article</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm text-white hover:bg-black/50 transition-all duration-300 sm:right-4 sm:h-12 sm:w-12"
-            onClick={goToNext}
-          >
-            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="sr-only">Next article</span>
-          </Button>
-        </>
-      )}
-
-      {/* Modern Mobile Controls */}
-      {displayArticles.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
-          {/* Play/Pause - Desktop only */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden h-8 w-8 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300 sm:flex"
-            onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-            aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
-          >
-            {isAutoPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-          </Button>
-          
-          {/* Modern Dots */}
-          <div className="flex items-center gap-2 rounded-full bg-black/30 backdrop-blur-sm px-3 py-2">
-            {displayArticles.map((_, index) => (
-              <button
-                key={index}
-                className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? "w-8 bg-white" 
-                    : "bg-white/30 hover:bg-white/50"
-                }`}
-                onClick={() => goToSlide(index)}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Simple Progress Bar - Hidden on mobile */}
-      {displayArticles.length > 1 && (
-        <div className="absolute bottom-0 left-0 h-0.5 w-full bg-white/10 hidden sm:block">
-          <div 
-            className="h-full bg-white/60 transition-all duration-500"
-            style={{ 
-              width: `${((currentIndex + 1) / displayArticles.length) * 100}%` 
-            }}
-          />
-        </div>
-      )}
-
-      {/* Slide Counter - Hidden on mobile */}
-      {displayArticles.length > 1 && (
-        <div className="absolute top-4 right-4 rounded-full bg-black/20 backdrop-blur-sm px-3 py-1 border border-white/30 hidden sm:block">
-          <span className="text-xs font-semibold text-white">
-            {currentIndex + 1}/{displayArticles.length}
-          </span>
-        </div>
-      )}
     </section>
   )
 }
