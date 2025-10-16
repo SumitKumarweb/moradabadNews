@@ -42,7 +42,8 @@ async function findArticleBySlug(slug, category) {
     const targetSlug = generateSlug(slug)
     
     return articles.find(article => {
-      const articleSlug = generateSlug(article.title)
+      const titleForUrl = article.englishTitle || article.title
+      const articleSlug = generateSlug(titleForUrl)
       return articleSlug === targetSlug
     })
   } catch (error) {

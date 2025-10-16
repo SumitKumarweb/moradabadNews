@@ -23,6 +23,7 @@ export function PostFormDialog({ open, onOpenChange, onSuccess, post }) {
   const [showMetadata, setShowMetadata] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
+    englishTitle: "",
     summary: "",
     content: "",
     category: "moradabad",
@@ -41,6 +42,7 @@ export function PostFormDialog({ open, onOpenChange, onSuccess, post }) {
     if (post) {
       setFormData({
         title: post.title,
+        englishTitle: post.englishTitle || "",
         summary: post.summary,
         content: post.content,
         category: post.category,
@@ -58,6 +60,7 @@ export function PostFormDialog({ open, onOpenChange, onSuccess, post }) {
       // Reset form when creating new post
       setFormData({
         title: "",
+        englishTitle: "",
         summary: "",
         content: "",
         category: "moradabad",
@@ -146,10 +149,25 @@ export function PostFormDialog({ open, onOpenChange, onSuccess, post }) {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
-                placeholder="Enter post title"
+                placeholder="Enter post title (Hindi/English)"
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="englishTitle">English Title (for URL)</Label>
+              <Input
+                id="englishTitle"
+                value={formData.englishTitle}
+                onChange={(e) => setFormData({ ...formData, englishTitle: e.target.value })}
+                placeholder="Enter English title for URL generation"
+              />
+              <p className="text-xs text-muted-foreground">
+                If main title is in Hindi, provide English title for better URL generation
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
               <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
@@ -321,4 +339,5 @@ export function PostFormDialog({ open, onOpenChange, onSuccess, post }) {
     </Dialog>
   )
 }
+
 

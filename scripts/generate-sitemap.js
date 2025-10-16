@@ -138,7 +138,9 @@ function generateSlug(text) {
 
 // Generate article URL
 function generateArticleUrl(article) {
-  const slug = generateSlug(article.title)
+  // Use English title for URL if available, otherwise use the main title
+  const titleForUrl = article.englishTitle || article.title
+  const slug = generateSlug(titleForUrl)
   return `/news/${article.category}/${slug}`
 }
 

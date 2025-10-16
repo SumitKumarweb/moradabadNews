@@ -15,7 +15,7 @@ import { db, auth } from "./firebase"
 import { signInWithEmailAndPassword, updatePassword, updateEmail } from "firebase/auth"
 
 // Data shape comments for reference:
-// NewsArticle: { id, title, summary, content, category, image, author, publishedAt, tags, isFeatured, isTrending, views, metaTitle?, metaDescription?, metaKeywords?, ogImage? }
+// NewsArticle: { id, title, englishTitle?, summary, content, category, image, author, publishedAt, tags, isFeatured, isTrending, views, metaTitle?, metaDescription?, metaKeywords?, ogImage? }
 // QuizQuestion: { id, question, options, correctAnswer, explanation?, category, createdAt, batchNumber?, batchDate? }
 // Category: { id, name, slug, description?, createdAt }
 // FeaturedVideo: { id, videoId, title, description, isActive, createdAt }
