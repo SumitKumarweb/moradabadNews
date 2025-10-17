@@ -25,7 +25,7 @@ const sampleArticle = {
 
 // Generate test structured data
 function generateTestStructuredData() {
-  const baseUrl = 'https://moradabadnews.com'
+  const baseUrl = 'https://moradabads.com'
   
   return {
     "@context": "https://schema.org",
@@ -61,7 +61,7 @@ function generateTestStructuredData() {
 
 // Generate organization schema
 function generateOrganizationSchema() {
-  const baseUrl = 'https://moradabadnews.com'
+  const baseUrl = 'https://moradabads.com'
   
   return {
     "@context": "https://schema.org",
@@ -85,7 +85,7 @@ function generateOrganizationSchema() {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
-      "email": "contact@moradabadnews.com"
+      "email": "contact@moradabads.com"
     },
     "sameAs": [
       "https://twitter.com/moradabadnews",
@@ -96,7 +96,7 @@ function generateOrganizationSchema() {
 
 // Generate website schema
 function generateWebsiteSchema() {
-  const baseUrl = 'https://moradabadnews.com'
+  const baseUrl = 'https://moradabads.com'
   
   return {
     "@context": "https://schema.org",
@@ -125,7 +125,7 @@ function generateWebsiteSchema() {
 
 // Generate breadcrumb schema
 function generateBreadcrumbSchema() {
-  const baseUrl = 'https://moradabadnews.com'
+  const baseUrl = 'https://moradabads.com'
   
   return {
     "@context": "https://schema.org",

@@ -74,7 +74,7 @@ export default function CareersPage() {
                   <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-4 text-lg font-semibold">No openings at the moment</h3>
                   <p className="text-sm text-muted-foreground">
-                    Check back later for new opportunities or send your resume to careers@moradabadnews.com
+                    Check back later for new opportunities or send your resume to careers@moradabads.com
                   </p>
                 </CardContent>
               </Card>

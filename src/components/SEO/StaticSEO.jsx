@@ -22,7 +22,7 @@ export default function StaticSEO({
   organization = false,
 }) {
   const siteName = 'Moradabad News'
-  const siteUrl = 'https://moradabadnews.com'
+  const siteUrl = 'https://moradabads.com'
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : siteUrl
   const finalUrl = url || (typeof window !== 'undefined' ? window.location.href : siteUrl)
   const finalImage = image || '/images/og-default.jpg'

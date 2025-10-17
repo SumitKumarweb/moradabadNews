@@ -6,7 +6,7 @@ export const env = {
   GA_MEASUREMENT_ID: import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX',
   
   // Site Configuration
-  SITE_URL: import.meta.env.VITE_SITE_URL || 'https://moradabadnews.com',
+  SITE_URL: import.meta.env.VITE_SITE_URL || 'https://moradabads.com',
   SITE_NAME: import.meta.env.VITE_SITE_NAME || 'Moradabad News',
   
   // Environment

@@ -51,7 +51,7 @@ npm run deploy:build
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://moradabadnews.com/</loc>
+    <loc>https://moradabads.com/</loc>
     <lastmod>2025-01-10T10:30:00Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>

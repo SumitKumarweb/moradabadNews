@@ -6,7 +6,7 @@ export default function LocalSEO({
   businessType = "News Website",
   address = "Moradabad, Uttar Pradesh, India",
   phone = "+91-8791447027",
-  email = "contact@moradabadnews.com",
+  email = "contact@moradabads.com",
   coordinates = { lat: 28.8381, lng: 78.7733 },
   openingHours = "24/7",
   socialMedia = {},
@@ -150,7 +150,7 @@ export default function LocalSEO({
           "name": "How can I contact Moradabad News?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "You can contact us via email at contact@moradabadnews.com or call us at +91-8791447027. We're also active on social media platforms."
+            "text": "You can contact us via email at contact@moradabads.com or call us at +91-8791447027. We're also active on social media platforms."
           }
         }
       ]

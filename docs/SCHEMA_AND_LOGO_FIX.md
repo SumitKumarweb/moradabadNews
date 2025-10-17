@@ -62,10 +62,10 @@ npm run test-schema
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "Moradabad News",
-  "url": "https://moradabadnews.com",
+  "url": "https://moradabads.com",
   "logo": {
     "@type": "ImageObject",
-    "url": "https://moradabadnews.com/logo.svg",
+    "url": "https://moradabads.com/logo.svg",
     "width": 200,
     "height": 60
   }
@@ -83,7 +83,7 @@ npm run test-schema
     "name": "Moradabad News",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://moradabadnews.com/logo.svg",
+      "url": "https://moradabads.com/logo.svg",
       "width": 200,
       "height": 60
     }
@@ -111,7 +111,7 @@ npm run test-schema
 ### 1. **Submit to Google Search Console**
 1. Go to [Google Search Console](https://search.google.com/search-console)
 2. Add your property
-3. Submit your sitemap: `https://moradabadnews.com/sitemap.xml`
+3. Submit your sitemap: `https://moradabads.com/sitemap.xml`
 4. Request indexing for important pages
 
 ### 2. **Test Rich Results**

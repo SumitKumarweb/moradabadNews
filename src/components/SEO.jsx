@@ -21,7 +21,7 @@ export default function SEO({
   organization = false,
 }) {
   const siteName = 'Moradabad News'
-  const siteUrl = 'https://moradabadnews.com'
+  const siteUrl = 'https://moradabads.com'
   
   // Enhanced keyword research for Moradabad news niche
   const primaryKeywords = [

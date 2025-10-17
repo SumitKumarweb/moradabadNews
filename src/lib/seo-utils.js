@@ -4,7 +4,7 @@ import { format } from 'date-fns'
 // Site configuration
 export const SITE_CONFIG = {
   name: 'Moradabad News',
-  url: 'https://moradabadnews.com',
+  url: 'https://moradabads.com',
   description: 'Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories.',
   defaultImage: '/logo.svg',
   logo: {
@@ -337,7 +337,7 @@ export function generateOrganizationData() {
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
-      "email": "contact@moradabadnews.com"
+      "email": "contact@moradabads.com"
     },
     "sameAs": [
       "https://facebook.com/moradabadnews",

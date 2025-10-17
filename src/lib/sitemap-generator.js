@@ -2,7 +2,7 @@
 import { getAllArticles } from './firebase-service'
 import { generateArticleUrl } from './utils'
 
-const SITE_URL = 'https://moradabadnews.com'
+const SITE_URL = 'https://moradabads.com'
 
 // Static pages configuration
 const staticPages = [
