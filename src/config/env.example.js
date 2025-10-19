@@ -21,7 +21,4 @@ export const env = {
   FIREBASE_MESSAGING_SENDER_ID: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
 }
-
-// Usage example:
-// import { env } from './config/env.js'
-// const gaId = env.GA_MEASUREMENT_ID
+ 

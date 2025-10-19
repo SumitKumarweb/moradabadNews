@@ -2,31 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moradabad News - Latest News & Updates</title>
+    <meta name="description" content="Get the latest news, current affairs, and updates from Moradabad and surrounding areas." />
   </head>
   <body>
-    <script>
-      // Apply theme before React loads to prevent flash
-      (function() {
-        const theme = localStorage.getItem('moradabad-news-theme') || 'light';
-        const root = document.documentElement;
-        
-        if (theme === 'system') {
-          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          root.classList.add(systemTheme);
-        } else {
-          root.classList.add(theme);
-        }
-      })();
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-

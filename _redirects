@@ -1,0 +1,20 @@
+# Netlify redirects file
+# This file should be in the publish directory (dist/client)
+
+# API routes
+/api/* /.netlify/functions/:splat 200
+
+# SSR routes for dynamic pages
+/news/* /.netlify/functions/ssr 200
+/about /.netlify/functions/ssr 200
+/contact /.netlify/functions/ssr 200
+/careers /.netlify/functions/ssr 200
+/services /.netlify/functions/ssr 200
+/current-affairs /.netlify/functions/ssr 200
+/search /.netlify/functions/ssr 200
+
+# Admin routes
+/nimda/* /.netlify/functions/ssr 200
+
+# SPA fallback
+/* /index.html 200
