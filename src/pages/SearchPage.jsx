@@ -8,8 +8,6 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Search, Filter, Calendar, User, TrendingUp, Clock, Newspaper } from 'lucide-react'
-import SearchSEO from '../components/SEO/SearchSEO'
-import StaticSEO from '../components/SEO/StaticSEO'
 import { useSearchWithFilters } from '../hooks/use-search'
 import searchService from '../lib/search-service'
 import { format } from 'date-fns'
@@ -83,25 +81,6 @@ export default function SearchPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Static SEO for server-side rendering */}
-      {searchQuery && (
-        <StaticSEO
-          title={`Search Results for "${searchQuery}" - Moradabad News`}
-          description={`Search results for "${searchQuery}" on Moradabad News. Find the latest news, articles, and updates about Moradabad, Uttar Pradesh, India.`}
-          keywords={`search results, ${searchQuery}, Moradabad news, UP news, local search`}
-          image="/images/search-og.jpg"
-          type="website"
-          noindex={true}
-          url={`/search?q=${encodeURIComponent(searchQuery)}`}
-        />
-      )}
-      
-      {/* Dynamic SEO for client-side */}
-      <SearchSEO 
-        query={searchQuery}
-        results={searchResults}
-        totalResults={searchResults.length}
-      />
       <SiteHeader />
       
       <main className="flex-1">

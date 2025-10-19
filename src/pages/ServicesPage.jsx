@@ -12,7 +12,6 @@ import {
 } from 'lucide-react'
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
-import SEO from '../components/SEO'
 
 export default function ServicesPage() {
   const [services, setServices] = useState([])
@@ -81,11 +80,6 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO 
-        title="Our Services - Digital Solutions for Education & Business"
-        description="Explore our digital services including Library Management System and more. Professional solutions for modern organizations."
-        keywords="library management system, digital services, education technology, business solutions"
-      />
       <SiteHeader />
       
       <main className="container mx-auto px-4 py-8">

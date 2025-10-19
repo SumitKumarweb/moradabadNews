@@ -4,9 +4,6 @@ import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
-import CategorySEO from '../components/SEO/CategorySEO'
-import StaticSEO from '../components/SEO/StaticSEO'
-import useAnalytics from '../hooks/use-analytics'
 import { getArticlesByCategory } from '../lib/firebase-service'
 import { Loader2 } from 'lucide-react'
 
@@ -23,11 +20,6 @@ export default function CategoryPage() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Track category page visit
-  useAnalytics({ 
-    pageType: 'category',
-    category: category
-  })
 
   useEffect(() => {
     let isMounted = true
@@ -74,28 +66,6 @@ export default function CategoryPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Static SEO for server-side rendering */}
-      {category && (
-        <StaticSEO
-          title={`${categoryName} News - Moradabad News`}
-          description={`Latest updates and breaking stories from ${categoryName.toLowerCase()}. Stay informed with the most recent news and developments from Moradabad, UP, India.`}
-          keywords={`${categoryName}, latest news, breaking news, updates, ${category} news, Moradabad news, UP news`}
-          image={`/images/categories/${category}.jpg`}
-          type="website"
-          category={category}
-          url={`/news/${category}`}
-        />
-      )}
-      
-      {/* Dynamic SEO for client-side */}
-      <CategorySEO 
-        category={category}
-        articles={articles}
-        breadcrumbs={[
-          { name: "Home", url: "/" },
-          { name: categoryName, url: `/news/${category}` }
-        ]}
-      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

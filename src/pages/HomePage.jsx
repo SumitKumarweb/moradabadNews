@@ -6,13 +6,6 @@ import { TrendingNews } from '../components/TrendingNews'
 import { NewsByCategory } from '../components/NewsByCategory'
 import { VideoSection } from '../components/VideoSection'
 import { HeaderBanner } from '../components/HeaderBanner'
-import SEO from '../components/SEO'
-import StaticSEO from '../components/SEO/StaticSEO'
-import LocalSEO from '../components/LocalSEO'
-import useAnalytics from '../hooks/use-analytics'
-import googleAnalytics from '../lib/google-analytics'
-import performanceOptimizer from '../lib/performance-optimization'
-import searchIntegration from '../lib/search-integration'
 import { 
   getFeaturedArticles, 
   getTrendingArticles,
@@ -36,54 +29,8 @@ export default function HomePage() {
   const [headerBanners, setHeaderBanners] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Track homepage visit
-  useAnalytics({ pageType: 'home' })
-
   useEffect(() => {
     loadAllData()
-    
-    // Initialize performance optimizations
-    performanceOptimizer.init()
-    
-    // Track page view with Google Analytics
-    googleAnalytics.trackPageView({
-      page_title: 'Moradabad News - Latest News from Moradabad, UP, India',
-      page_path: '/',
-      content_group1: 'Homepage',
-      content_group2: 'Main'
-    })
-    
-    // Initialize search integration for real-time updates
-    searchIntegration.startListening()
-    
-    // Track scroll depth
-    let maxScroll = 0
-    const handleScroll = () => {
-      const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100)
-      if (scrollPercent > maxScroll) {
-        maxScroll = scrollPercent
-        if (maxScroll % 25 === 0) { // Track every 25%
-          googleAnalytics.trackScrollDepth(maxScroll)
-        }
-      }
-    }
-    
-    window.addEventListener('scroll', handleScroll)
-    
-    // Track time on page
-    const startTime = Date.now()
-    const trackTimeOnPage = () => {
-      const timeSpent = (Date.now() - startTime) / 1000
-      googleAnalytics.trackTimeOnPage(timeSpent)
-    }
-    
-    // Track time when user leaves page
-    window.addEventListener('beforeunload', trackTimeOnPage)
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('beforeunload', trackTimeOnPage)
-    }
   }, [])
 
   async function loadAllData() {
@@ -129,27 +76,6 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Static SEO for server-side rendering */}
-      <StaticSEO
-        title="Moradabad News - Latest Breaking News from Moradabad, UP, India"
-        description="Get the latest breaking news, current affairs, and updates from Moradabad, Uttar Pradesh, India. Your trusted source for local news, politics, business, and community events in Moradabad."
-        keywords="Moradabad news, UP news, breaking news Moradabad, Moradabad current affairs, local news Moradabad, Uttar Pradesh news, Moradabad politics, Moradabad business news"
-        type="website"
-        category="news"
-        tags={["Moradabad", "UP", "India", "breaking news", "current affairs"]}
-        url="/"
-      />
-      
-      {/* Dynamic SEO for client-side */}
-      <SEO 
-        title="Moradabad News - Latest Breaking News from Moradabad, UP, India"
-        description="Get the latest breaking news, current affairs, and updates from Moradabad, Uttar Pradesh, India. Your trusted source for local news, politics, business, and community events in Moradabad."
-        keywords="Moradabad news, UP news, breaking news Moradabad, Moradabad current affairs, local news Moradabad, Uttar Pradesh news, Moradabad politics, Moradabad business news"
-        type="website"
-        category="news"
-        tags={["Moradabad", "UP", "India", "breaking news", "current affairs"]}
-      />
-      <LocalSEO />
       
       {headerBanners.length > 0 && <HeaderBanner banners={headerBanners} />}
       <SiteHeader />

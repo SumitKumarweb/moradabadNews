@@ -1,18 +1,12 @@
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
-import SEO from '../components/SEO'
 import { Card, CardContent } from '../components/ui/card'
 import { Target, Users, Award, Globe } from 'lucide-react'
 
 export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <SEO
-        title="About Us"
-        description="Learn about Moradabad News - your trusted source for the latest news from Moradabad, Uttar Pradesh, India, and around the world. We are committed to delivering accurate, timely, and unbiased news coverage."
-        keywords="about Moradabad News, news platform, journalism, media, Moradabad, news coverage"
-      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">

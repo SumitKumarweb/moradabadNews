@@ -4,9 +4,6 @@ import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import BreadcrumbNav from '../components/BreadcrumbNav'
 import { NewsCard } from '../components/NewsCard'
-import ArticleSEO from '../components/SEO/ArticleSEO'
-import StaticSEO from '../components/SEO/StaticSEO'
-import useAnalytics from '../hooks/use-analytics'
 import {
   getArticleById,
   getArticlesByCategory,
@@ -58,13 +55,6 @@ export default function ArticlePage() {
   const [recommendedArticles, setRecommendedArticles] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Track article view with analytics
-  useAnalytics({
-    pageType: 'article',
-    articleId: article?.id,
-    articleTitle: article?.title,
-    category: article?.category,
-  })
 
   useEffect(() => {
     let isMounted = true
@@ -113,14 +103,6 @@ export default function ArticlePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col">
-        {/* Static SEO for loading state */}
-        <StaticSEO
-          title="Loading Article - Moradabad News"
-          description="Loading the latest news article from Moradabad News. Stay updated with breaking news and current affairs."
-          keywords="Moradabad news, loading, latest news, breaking news"
-          type="website"
-          url={`/news/${category}/${slug}`}
-        />
         <SiteHeader />
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -149,32 +131,6 @@ export default function ArticlePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Static SEO for server-side rendering */}
-      {article && (
-        <StaticSEO
-          title={article.metaTitle || article.title}
-          description={article.metaDescription || article.summary}
-          keywords={article.metaKeywords?.join(', ') || article.tags?.join(', ')}
-          image={article.ogImage || article.image}
-          type="article"
-          author={article.author}
-          publishedTime={article.publishedAt}
-          modifiedTime={article.modifiedAt}
-          category={article.category}
-          tags={article.tags}
-          url={`/news/${category}/${slug}`}
-        />
-      )}
-      
-      {/* Dynamic SEO for client-side */}
-      <ArticleSEO 
-        article={article}
-        breadcrumbs={[
-          { name: "Home", url: "/" },
-          { name: categoryName, url: `/news/${category}` },
-          { name: article.title, url: `/news/${category}/${slug}` }
-        ]}
-      />
       <SiteHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
