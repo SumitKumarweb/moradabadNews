@@ -287,11 +287,7 @@ export default function HomePage() {
       
       <main className="flex-1" id="main-content">
         {/* Hero Section with Featured and Recent News */}
-        <HeroSection 
-          featuredArticles={featuredArticles}
-          latestArticles={trendingArticles}
-          moradabadNews={moradabadNews}
-        />
+        <HeroSection />
  
 
         {/* Enhanced Statistics Section */}

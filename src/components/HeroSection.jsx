@@ -7,16 +7,24 @@ import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { formatDistanceToNow } from 'date-fns'
 import { generateArticleUrl } from '../lib/utils'
+import { getFeaturedArticles, getTrendingArticles, getArticlesByCategory } from '../lib/firebase-service'
 
-export function HeroSection({ 
-  featuredArticles = [], 
-  latestArticles = [], 
-  moradabadNews = [] 
-}) {
+export function HeroSection() {
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
   
+  // Data states
+  const [featuredArticles, setFeaturedArticles] = useState([])
+  const [latestArticles, setLatestArticles] = useState([])
+  const [moradabadNews, setMoradabadNews] = useState([])
+  const [loading, setLoading] = useState(true)
+  
+  // Load data on component mount
+  useEffect(() => {
+    loadHeroData()
+  }, [])
+
   // Auto-rotate featured articles
   useEffect(() => {
     if (!isAutoPlaying || isHovered || featuredArticles.length <= 1) return
@@ -27,6 +35,29 @@ export function HeroSection({
 
     return () => clearInterval(interval)
   }, [isAutoPlaying, isHovered, featuredArticles.length])
+
+  // Load hero section data
+  const loadHeroData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all data in parallel
+      const [featured, trending, moradabad] = await Promise.all([
+        getFeaturedArticles(),
+        getTrendingArticles(),
+        getArticlesByCategory("moradabad")
+      ])
+
+      setFeaturedArticles(featured)
+      setLatestArticles(trending)
+      setMoradabadNews(moradabad.slice(0, 3)) // Only show 3 for hero grid
+      
+    } catch (error) {
+      console.error('Error loading hero data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handlePrev = () => {
     setCurrentFeaturedIndex((prev) => 
@@ -42,12 +73,23 @@ export function HeroSection({
     setIsAutoPlaying(!isAutoPlaying)
   }
 
-  if (featuredArticles.length === 0 && latestArticles.length === 0) {
+  if (loading) {
     return (
       <section className="relative min-h-[70vh] from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center text-white">
           <h1 className="text-4xl font-bold mb-4">Moradabad News</h1>
           <p className="text-xl opacity-90">Loading latest news...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (featuredArticles.length === 0 && latestArticles.length === 0) {
+    return (
+      <section className="relative min-h-[70vh] from-slate-900 to-slate-800 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-4xl font-bold mb-4">Moradabad News</h1>
+          <p className="text-xl opacity-90">No articles available</p>
         </div>
       </section>
     )
