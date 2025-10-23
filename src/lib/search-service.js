@@ -33,6 +33,12 @@ class SearchService {
     if (this.isInitialized) return
 
     try {
+      // Check if Firebase is initialized
+      if (!db) {
+        console.warn('Firebase database not initialized, skipping search index')
+        return
+      }
+
       // Fetch all articles from Firebase
       const articlesRef = collection(db, 'articles')
       const articlesQuery = query(

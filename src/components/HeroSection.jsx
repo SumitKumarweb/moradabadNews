@@ -75,10 +75,13 @@ export function HeroSection() {
 
   if (loading) {
     return (
-      <section className="relative min-h-[70vh] from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="text-4xl font-bold mb-4">Moradabad News</h1>
-          <p className="text-xl opacity-90">Loading latest news...</p>
+      <section className="hero-section">
+        <div className="hero-content">
+          <div className="text-center text-white">
+            <h1 className="hero-title">Moradabad News</h1>
+            <p className="hero-subtitle">Loading latest news...</p>
+            <div className="loading-spinner"></div>
+          </div>
         </div>
       </section>
     )

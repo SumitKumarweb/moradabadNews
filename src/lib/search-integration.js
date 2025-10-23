@@ -20,6 +20,12 @@ class SearchIntegration {
     if (this.isListening) return
 
     try {
+      // Check if Firebase is initialized
+      if (!db) {
+        console.warn('Firebase database not initialized, skipping search integration')
+        return
+      }
+
       const articlesRef = collection(db, 'articles')
       const articlesQuery = query(
         articlesRef,

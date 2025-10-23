@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './components/theme-provider'
 import { Toaster } from './components/ui/toaster'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // Pages
 import HomePage from './pages/HomePage'
@@ -41,9 +42,10 @@ import { CookieConsent } from './components/CookieConsent'
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="moradabad-news-theme">
-      <Router>
-        <Routes>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="light" storageKey="moradabad-news-theme">
+        <Router>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -79,10 +81,11 @@ function App() {
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
-        <Toaster />
-        <CookieConsent />
-      </Router>
-    </ThemeProvider>
+          <Toaster />
+          <CookieConsent />
+        </Router>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 

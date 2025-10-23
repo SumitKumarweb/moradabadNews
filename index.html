@@ -141,6 +141,78 @@
     <!-- AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8141314854363213"
      crossorigin="anonymous"></script>
+    
+    <!-- Critical CSS for FCP optimization -->
+    <style>
+      /* Critical above-the-fold styles */
+      * { box-sizing: border-box; }
+      body { 
+        margin: 0; 
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        color: #1f2937;
+        background: #ffffff;
+      }
+      
+      /* Hero section critical styles */
+      .hero-section { 
+        min-height: 70vh; 
+        position: relative; 
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        overflow: hidden;
+      }
+      
+      /* Loading spinner */
+      .loading-spinner { 
+        width: 40px; 
+        height: 40px; 
+        border: 4px solid #f3f3f3; 
+        border-top: 4px solid #3498db; 
+        border-radius: 50%; 
+        animation: spin 1s linear infinite; 
+        margin: 20px auto;
+      }
+      
+      @keyframes spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+      }
+      
+      /* Critical layout styles */
+      .container { 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 0 1rem; 
+      }
+      
+      /* Prevent layout shift */
+      .hero-content {
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* Critical text styles */
+      .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+      }
+      
+      /* Performance optimizations */
+      img { max-width: 100%; height: auto; }
+      .lazy { opacity: 0; transition: opacity 0.3s; }
+      .lazy.loaded { opacity: 1; }
+    </style>
   </head>
   <body>
     <script>

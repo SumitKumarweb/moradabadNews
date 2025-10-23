@@ -11,9 +11,16 @@ import { trackPageView } from '../lib/analytics-service'
  */
 export function useAnalytics(pageData = {}) {
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined') return
+    
     // Track page view when component mounts
     const track = async () => {
-      await trackPageView(pageData)
+      try {
+        await trackPageView(pageData)
+      } catch (error) {
+        console.warn('Analytics tracking failed:', error)
+      }
     }
     
     // Small delay to ensure page is loaded
