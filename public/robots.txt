@@ -3,8 +3,55 @@ Allow: /
 
 # Sitemap
 Sitemap: https://moradabads.com/sitemap.xml
+Sitemap: https://moradabads.com/sitemap-articles.xml
+Sitemap: https://moradabads.com/sitemap-categories.xml
+Sitemap: https://moradabads.com/sitemap-pages.xml
 
 # Disallow admin areas
 Disallow: /nimda/
 Disallow: /admin/
 Disallow: /api/
+
+# Disallow search pages (avoid duplicate content)
+Disallow: /search?*
+Disallow: /search/
+
+# Disallow user-generated content
+Disallow: /user/
+Disallow: /profile/
+
+# Allow important pages
+Allow: /about
+Allow: /contact
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /careers
+Allow: /services
+
+# Crawl delay for better server performance
+Crawl-delay: 1
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 3
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 2

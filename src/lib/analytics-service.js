@@ -238,6 +238,16 @@ export async function getAnalyticsSummary(days = 30) {
     const totalPageViews = data.length
     const uniqueSessions = new Set(data.map(item => item.sessionId)).size
     
+    // Homepage specific statistics
+    const homepageVisits = data.filter(item => 
+      item.pageUrl === '/' || 
+      item.pageUrl === '/home' || 
+      item.pageType === 'home' ||
+      item.pageTitle?.includes('Moradabad News - Latest')
+    )
+    const homepageVisitors = new Set(homepageVisits.map(item => item.ipHash)).size
+    const homepagePageViews = homepageVisits.length
+    
     // Count by country
     const byCountry = {}
     data.forEach(item => {
@@ -273,6 +283,8 @@ export async function getAnalyticsSummary(days = 30) {
       totalPageViews,
       uniqueVisitors,
       uniqueSessions,
+      homepageVisitors,
+      homepagePageViews,
       byCountry,
       byDevice,
       topArticles,
@@ -284,6 +296,8 @@ export async function getAnalyticsSummary(days = 30) {
       totalPageViews: 0,
       uniqueVisitors: 0,
       uniqueSessions: 0,
+      homepageVisitors: 0,
+      homepagePageViews: 0,
       byCountry: {},
       byDevice: {},
       topArticles: [],
@@ -298,10 +312,21 @@ export async function getTodayStats() {
     const today = new Date().toISOString().split('T')[0]
     const data = await getAnalytics({ startDate: today, endDate: today })
     
+    // Homepage specific stats for today
+    const todayHomepageVisits = data.filter(item => 
+      item.pageUrl === '/' || 
+      item.pageUrl === '/home' || 
+      item.pageType === 'home' ||
+      item.pageTitle?.includes('Moradabad News - Latest')
+    )
+    const todayHomepageVisitors = new Set(todayHomepageVisits.map(item => item.ipHash)).size
+    
     return {
       todayVisitors: new Set(data.map(item => item.ipHash)).size,
       todayPageViews: data.length,
       todaySessions: new Set(data.map(item => item.sessionId)).size,
+      todayHomepageVisitors,
+      todayHomepagePageViews: todayHomepageVisits.length,
     }
   } catch (error) {
     console.error('Error fetching today stats:', error)
@@ -309,6 +334,112 @@ export async function getTodayStats() {
       todayVisitors: 0,
       todayPageViews: 0,
       todaySessions: 0,
+      todayHomepageVisitors: 0,
+      todayHomepagePageViews: 0,
+    }
+  }
+}
+
+// Get homepage visitor statistics with conditions
+export async function getHomepageVisitorStats(days = 30) {
+  try {
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - days)
+    const startDateString = startDate.toISOString().split('T')[0]
+    
+    const data = await getAnalytics({ startDate: startDateString })
+    
+    // Filter homepage visits with multiple conditions
+    const homepageVisits = data.filter(item => {
+      const isHomepage = 
+        item.pageUrl === '/' || 
+        item.pageUrl === '/home' || 
+        item.pageType === 'home' ||
+        item.pageTitle?.includes('Moradabad News - Latest') ||
+        item.pageTitle?.includes('Latest Breaking News from Moradabad') ||
+        (item.pageUrl === '' && item.pageType === 'page') ||
+        item.pageUrl === '/index.html'
+      
+      return isHomepage
+    })
+    
+    // Calculate unique visitors to homepage
+    const uniqueHomepageVisitors = new Set(homepageVisits.map(item => item.ipHash)).size
+    const totalHomepagePageViews = homepageVisits.length
+    
+    // Get visitor conditions/characteristics
+    const visitorConditions = {
+      byCountry: {},
+      byDevice: {},
+      byBrowser: {},
+      byTimeOfDay: {},
+      byReferrer: {},
+      returningVisitors: 0,
+      newVisitors: 0
+    }
+    
+    homepageVisits.forEach(item => {
+      // Country distribution
+      visitorConditions.byCountry[item.country] = (visitorConditions.byCountry[item.country] || 0) + 1
+      
+      // Device distribution
+      visitorConditions.byDevice[item.deviceType] = (visitorConditions.byDevice[item.deviceType] || 0) + 1
+      
+      // Browser distribution
+      visitorConditions.byBrowser[item.browser] = (visitorConditions.byBrowser[item.browser] || 0) + 1
+      
+      // Time of day analysis
+      const hour = new Date(item.timestamp).getHours()
+      const timeSlot = hour < 6 ? 'Night (12AM-6AM)' : 
+                      hour < 12 ? 'Morning (6AM-12PM)' : 
+                      hour < 18 ? 'Afternoon (12PM-6PM)' : 'Evening (6PM-12AM)'
+      visitorConditions.byTimeOfDay[timeSlot] = (visitorConditions.byTimeOfDay[timeSlot] || 0) + 1
+      
+      // Referrer analysis
+      const referrer = item.referrer === 'Direct' ? 'Direct' : 
+                      item.referrer.includes('google') ? 'Google' :
+                      item.referrer.includes('facebook') ? 'Facebook' :
+                      item.referrer.includes('twitter') ? 'Twitter' : 'Other'
+      visitorConditions.byReferrer[referrer] = (visitorConditions.byReferrer[referrer] || 0) + 1
+    })
+    
+    // Calculate returning vs new visitors (simplified)
+    const visitorCounts = {}
+    homepageVisits.forEach(item => {
+      visitorCounts[item.ipHash] = (visitorCounts[item.ipHash] || 0) + 1
+    })
+    
+    Object.values(visitorCounts).forEach(count => {
+      if (count > 1) {
+        visitorConditions.returningVisitors++
+      } else {
+        visitorConditions.newVisitors++
+      }
+    })
+    
+    return {
+      uniqueHomepageVisitors,
+      totalHomepagePageViews,
+      visitorConditions,
+      period: `Last ${days} days`,
+      averagePageViewsPerVisitor: uniqueHomepageVisitors > 0 ? (totalHomepagePageViews / uniqueHomepageVisitors).toFixed(2) : 0
+    }
+  } catch (error) {
+    console.error('Error fetching homepage visitor stats:', error)
+    return {
+      uniqueHomepageVisitors: 0,
+      totalHomepagePageViews: 0,
+      visitorConditions: {
+        byCountry: {},
+        byDevice: {},
+        byBrowser: {},
+        byTimeOfDay: {},
+        byReferrer: {},
+        returningVisitors: 0,
+        newVisitors: 0
+      },
+      period: `Last ${days} days`,
+      averagePageViewsPerVisitor: 0
     }
   }
 }

@@ -8,21 +8,14 @@ import { Button } from './ui/button'
 import { formatDistanceToNow } from 'date-fns'
 import { generateArticleUrl } from '../lib/utils'
 
-export function HeroSection({ articles , exculdeTrendingArticle}) {
+export function HeroSection({ 
+  featuredArticles = [], 
+  latestArticles = [], 
+  moradabadNews = [] 
+}) {
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isHovered, setIsHovered] = useState(false)
-
-  console.log(articles , 'articles')
-
-  // Separate featured and latest articles
-  const featuredArticles = articles.filter(article => article.isFeatured).slice(0, 3)
-  const latestArticles = articles
-    .filter(article => !article.isFeatured)
-    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-    .slice(0, 6)
-  const moradabadNewsExculdeTrending =  exculdeTrendingArticle
-  .filter(article => !article.isFeatured && !article.isTrending)
   
   // Auto-rotate featured articles
   useEffect(() => {
@@ -49,7 +42,7 @@ export function HeroSection({ articles , exculdeTrendingArticle}) {
     setIsAutoPlaying(!isAutoPlaying)
   }
 
-  if (articles.length === 0) {
+  if (featuredArticles.length === 0 && latestArticles.length === 0) {
     return (
       <section className="relative min-h-[70vh] from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center text-white">
@@ -184,7 +177,7 @@ export function HeroSection({ articles , exculdeTrendingArticle}) {
             )}
             {/* Small News Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 mt-11">
-              {moradabadNewsExculdeTrending.slice(0, 3).map((article, index) => (
+              {moradabadNews.slice(0, 3).map((article, index) => (
                 <Link key={article.id} to={generateArticleUrl(article)}>
                   <Card className="group overflow-hidden border-0 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-300 hover:scale-[1.02] shadow-lg h-full">
                     <div className="relative h-32 overflow-hidden">
@@ -244,7 +237,7 @@ export function HeroSection({ articles , exculdeTrendingArticle}) {
               <h2 className="text-2xl font-bold text-foreground">Latest News</h2>
             </div>
 
-            {latestArticles.map((article, index) => (
+            {latestArticles.slice(0, 6).map((article, index) => (
               <Link key={article.id} to={generateArticleUrl(article)}>
                 <Card className="group overflow-hidden border-0 bg-white/5 backdrop-blur-md hover:bg-white/15 transition-all duration-300 hover:scale-[1.02] shadow-lg">
                   <div className="flex gap-4 p-4">

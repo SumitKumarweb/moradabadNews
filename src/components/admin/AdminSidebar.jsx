@@ -81,6 +81,12 @@ const allNavItems = [
     roles: [ROLES.MASTER], // Only master
   },
   {
+    title: "Homepage Analytics",
+    to: "/nimda/homepage-analytics",
+    icon: Home,
+    roles: [ROLES.MASTER], // Only master
+  },
+  {
     title: "Services",
     to: "/nimda/services",
     icon: Library,

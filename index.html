@@ -20,25 +20,125 @@
     <meta name="language" content="English" />
     <meta name="revisit-after" content="1 days" />
     
+    <!-- Enhanced SEO Meta Tags -->
+    <meta name="googlebot" content="index,follow" />
+    <meta name="bingbot" content="index,follow" />
+    <meta name="slurp" content="index,follow" />
+    <meta name="duckduckbot" content="index,follow" />
+    <meta name="baiduspider" content="index,follow" />
+    <meta name="yandexbot" content="index,follow" />
+    
+    <!-- Geographic Meta Tags for Local SEO -->
+    <meta name="geo.region" content="IN-UP" />
+    <meta name="geo.placename" content="Moradabad" />
+    <meta name="geo.position" content="28.8381;78.7733" />
+    <meta name="ICBM" content="28.8381, 78.7733" />
+    <meta name="geo.region" content="IN-UP" />
+    <meta name="geo.placename" content="Moradabad, Uttar Pradesh" />
+    
     <!-- Open Graph / Facebook - Will be replaced by React Helmet -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://moradabads.com/" />
     <meta property="og:title" content="Moradabad News - Latest News from Moradabad, UP, India & World" />
     <meta property="og:description" content="Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories." />
-    <meta property="og:image" content="/logo.svg" />
+    <meta property="og:image" content="https://moradabads.com/logo.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Moradabad News Logo" />
     <meta property="og:site_name" content="Moradabad News" />
     <meta property="og:locale" content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
     
     <!-- Twitter - Will be replaced by React Helmet -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://moradabads.com/" />
     <meta property="twitter:title" content="Moradabad News - Latest News from Moradabad, UP, India & World" />
     <meta property="twitter:description" content="Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories." />
-    <meta property="twitter:image" content="/logo.svg" />
+    <meta property="twitter:image" content="https://moradabads.com/logo.svg" />
+    <meta property="twitter:image:alt" content="Moradabad News Logo" />
+    <meta property="twitter:site" content="@moradabadnews" />
+    <meta property="twitter:creator" content="@moradabadnews" />
     
     <!-- Additional Meta Tags -->
     <meta name="theme-color" content="#1e40af" />
+    <meta name="msapplication-TileColor" content="#1e40af" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Moradabad News" />
+    <meta name="application-name" content="Moradabad News" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Canonical URL -->
     <link rel="canonical" href="https://moradabads.com/" />
+    
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+    
+    <!-- DNS Prefetch for performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//www.google-analytics.com" />
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+    
+    <!-- Structured Data for Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Moradabad News",
+      "url": "https://moradabads.com",
+      "logo": "https://moradabads.com/logo.svg",
+      "description": "Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Moradabad",
+        "addressRegion": "Uttar Pradesh",
+        "addressCountry": "India"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "contact@moradabads.com"
+      },
+      "sameAs": [
+        "https://facebook.com/moradabadnews",
+        "https://twitter.com/moradabadnews",
+        "https://instagram.com/moradabadnews"
+      ]
+    }
+    </script>
+    
+    <!-- Website Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Moradabad News",
+      "url": "https://moradabads.com",
+      "description": "Get the latest news from Moradabad, Uttar Pradesh, India and around the world. Stay updated with trending news, current affairs, and breaking stories.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Moradabad News",
+        "url": "https://moradabads.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://moradabads.com/logo.svg",
+          "width": 200,
+          "height": 60
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://moradabads.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    
+    <!-- AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8141314854363213"
      crossorigin="anonymous"></script>
   </head>

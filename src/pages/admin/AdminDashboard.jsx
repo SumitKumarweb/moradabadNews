@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { getAllArticles, getAllQuizQuestions, getQuizCompletionCount } from '../../lib/firebase-service'
-import { FileText, TrendingUp, Eye, HelpCircle, CheckCircle2 } from 'lucide-react'
+import { getAnalyticsSummary, getTodayStats } from '../../lib/analytics-service'
+import { FileText, TrendingUp, Eye, HelpCircle, CheckCircle2, Users, Home, Globe, Activity } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -11,6 +12,13 @@ export default function AdminDashboard() {
     totalViews: 0,
     totalQuizQuestions: 0,
     quizCompletions: 0,
+    // Homepage visitor stats
+    homepageVisitors: 0,
+    todayHomepageVisitors: 0,
+    totalVisitors: 0,
+    todayVisitors: 0,
+    todayPageViews: 0,
+    todaySessions: 0,
   })
 
   useEffect(() => {
@@ -18,20 +26,39 @@ export default function AdminDashboard() {
   }, [])
 
   async function loadStats() {
-    const articles = await getAllArticles()
-    const quizQuestions = await getAllQuizQuestions()
-    const completionCount = await getQuizCompletionCount()
+    try {
+      const [articles, quizQuestions, completionCount, analyticsSummary, todayStats] = await Promise.all([
+        getAllArticles(),
+        getAllQuizQuestions(),
+        getQuizCompletionCount(),
+        getAnalyticsSummary(30),
+        getTodayStats()
+      ])
 
-    const totalViews = articles.reduce((sum, article) => sum + article.views, 0)
-    const trendingCount = articles.filter((article) => article.isTrending).length
+      const totalViews = articles.reduce((sum, article) => sum + article.views, 0)
+      const trendingCount = articles.filter((article) => article.isTrending).length
 
-    setStats({
-      totalArticles: articles.length,
-      trendingArticles: trendingCount,
-      totalViews,
-      totalQuizQuestions: quizQuestions.length,
-      quizCompletions: completionCount,
-    })
+      // Calculate homepage visitors from analytics
+      const homepageVisitors = analyticsSummary.uniqueVisitors || 0
+      const todayHomepageVisitors = todayStats.todayVisitors || 0
+
+      setStats({
+        totalArticles: articles.length,
+        trendingArticles: trendingCount,
+        totalViews,
+        totalQuizQuestions: quizQuestions.length,
+        quizCompletions: completionCount,
+        // Homepage visitor stats
+        homepageVisitors,
+        todayHomepageVisitors,
+        totalVisitors: analyticsSummary.uniqueVisitors || 0,
+        todayVisitors: todayStats.todayVisitors || 0,
+        todayPageViews: todayStats.todayPageViews || 0,
+        todaySessions: todayStats.todaySessions || 0,
+      })
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    }
   }
 
   return (
@@ -42,6 +69,54 @@ export default function AdminDashboard() {
           <p className="text-muted-foreground">Overview of your news website</p>
         </div>
 
+        {/* Homepage Visitor Stats */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Homepage Visitors</CardTitle>
+              <Home className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.homepageVisitors.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Last 30 days</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Today's Visitors</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.todayVisitors.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Unique visitors today</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Today's Page Views</CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.todayPageViews.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Total page views today</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Sessions</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.todaySessions.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Browsing sessions today</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Content Stats */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

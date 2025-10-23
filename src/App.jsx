@@ -30,6 +30,7 @@ import AdminHeaders from './pages/admin/AdminHeaders'
 import AdminVideos from './pages/admin/AdminVideos'
 import AdminQuiz from './pages/admin/AdminQuiz'
 import AdminAnalytics from './pages/admin/AdminAnalytics'
+import AdminHomepageAnalytics from './pages/admin/AdminHomepageAnalytics'
 import AdminServices from './pages/admin/AdminServices'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminUsers from './pages/admin/AdminUsers'
@@ -70,6 +71,7 @@ function App() {
           <Route path="/nimda/videos" element={<ProtectedRoute><AdminVideos /></ProtectedRoute>} />
           <Route path="/nimda/quiz" element={<ProtectedRoute><AdminQuiz /></ProtectedRoute>} />
           <Route path="/nimda/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="/nimda/homepage-analytics" element={<ProtectedRoute><AdminHomepageAnalytics /></ProtectedRoute>} />
           <Route path="/nimda/services" element={<ProtectedRoute><AdminServices /></ProtectedRoute>} />
           <Route path="/nimda/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
           <Route path="/nimda/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />

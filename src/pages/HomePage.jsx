@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import { HeroSection } from '../components/HeroSection'
@@ -35,12 +35,110 @@ export default function HomePage() {
   const [activeVideo, setActiveVideo] = useState(null)
   const [headerBanners, setHeaderBanners] = useState([])
   const [loading, setLoading] = useState(true)
+  
+  // Lazy loading states
+  const [loadedSections, setLoadedSections] = useState({
+    hero: false,
+    trending: false,
+    moradabad: false,
+    up: false,
+    india: false,
+    video: false,
+    global: false,
+    cta: false,
+    local: false
+  })
+  
+  // Refs for intersection observer
+  const sectionRefs = useRef({})
+  const observerRef = useRef(null)
 
   // Track homepage visit
   useAnalytics({ pageType: 'home' })
 
+  // Intersection Observer for lazy loading
+  const setupIntersectionObserver = useCallback(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+    }
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionName = entry.target.dataset.section
+            if (sectionName && !loadedSections[sectionName]) {
+              setLoadedSections(prev => ({ ...prev, [sectionName]: true }))
+              
+              // Load data for specific section
+              loadSectionData(sectionName)
+            }
+          }
+        })
+      },
+      {
+        rootMargin: '100px 0px', // Load 100px before section comes into view
+        threshold: 0.1
+      }
+    )
+
+    // Observe all section refs
+    Object.values(sectionRefs.current).forEach(ref => {
+      if (ref && observerRef.current) {
+        observerRef.current.observe(ref)
+      }
+    })
+  }, [loadedSections])
+
+  // Load data for specific section
+  const loadSectionData = useCallback(async (sectionName) => {
+    try {
+      switch (sectionName) {
+        case 'trending':
+          if (trendingArticles.length === 0) {
+            const trending = await getTrendingArticles()
+            setTrendingArticles(trending)
+          }
+          break
+        case 'moradabad':
+          if (moradabadNews.length === 0) {
+            const moradabad = await getArticlesByCategory("moradabad")
+            setMoradabadNews(moradabad.slice(0, 4))
+          }
+          break
+        case 'up':
+          if (upNews.length === 0) {
+            const up = await getArticlesByCategory("up")
+            setUpNews(up.slice(0, 4))
+          }
+          break
+        case 'india':
+          if (indiaNews.length === 0) {
+            const india = await getArticlesByCategory("india")
+            setIndiaNews(india.slice(0, 4))
+          }
+          break
+        case 'video':
+          if (!activeVideo) {
+            const video = await getActiveVideo()
+            setActiveVideo(video)
+          }
+          break
+        case 'global':
+          if (globalNews.length === 0) {
+            const global = await getArticlesByCategory("global")
+            setGlobalNews(global.slice(0, 4))
+          }
+          break
+      }
+    } catch (error) {
+      console.error(`Error loading ${sectionName} data:`, error)
+    }
+  }, [trendingArticles.length, moradabadNews.length, upNews.length, indiaNews.length, activeVideo, globalNews.length])
+
   useEffect(() => {
-    loadAllData()
+    // Load only critical data first (hero section)
+    loadCriticalData()
     
     // Initialize performance optimizations
     performanceOptimizer.init()
@@ -83,9 +181,42 @@ export default function HomePage() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('beforeunload', trackTimeOnPage)
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
     }
   }, [])
 
+  // Setup intersection observer when refs are ready
+  useEffect(() => {
+    if (Object.keys(sectionRefs.current).length > 0) {
+      setupIntersectionObserver()
+    }
+  }, [setupIntersectionObserver])
+
+  // Load only critical data for initial render
+  async function loadCriticalData() {
+    setLoading(true)
+    try {
+      // Load only hero section data and banners
+      const [featured, banners] = await Promise.all([
+        getFeaturedArticles(),
+        getActiveHeaderBanners(),
+      ])
+
+      setFeaturedArticles(featured)
+      setHeaderBanners(banners)
+      
+      // Mark hero section as loaded
+      setLoadedSections(prev => ({ ...prev, hero: true }))
+    } catch (error) {
+      console.error("Error loading critical data:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Legacy function for backward compatibility
   async function loadAllData() {
     setLoading(true)
     try {
@@ -156,7 +287,11 @@ export default function HomePage() {
       
       <main className="flex-1" id="main-content">
         {/* Hero Section with Featured and Recent News */}
-        <HeroSection articles={[...featuredArticles, ...trendingArticles]} exculdeTrendingArticle={[ ...moradabadNews , ...upNews , ...indiaNews , ...globalNews]}/>
+        <HeroSection 
+          featuredArticles={featuredArticles}
+          latestArticles={trendingArticles}
+          moradabadNews={moradabadNews}
+        />
  
 
         {/* Enhanced Statistics Section */}
@@ -196,70 +331,163 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Trending News */}
-        {trendingArticles.length > 0 && (
-          <section className="container mx-auto px-4 py-12">
-            <TrendingNews articles={trendingArticles} />
-          </section>
-        )}
+        {/* Trending News - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.trending = el}
+          data-section="trending"
+          className="container mx-auto px-4 py-12"
+        >
+          {loadedSections.trending ? (
+            trendingArticles.length > 0 ? (
+              <TrendingNews articles={trendingArticles} />
+            ) : (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading trending news...</p>
+              </div>
+            )
+          ) : (
+            <div className="text-center py-8">
+              <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
+            </div>
+          )}
+        </section>
 
-        {/* Moradabad News */}
-        {moradabadNews.length > 0 && (
-          <section className="container mx-auto px-4 py-12">
-            <NewsByCategory
-              title="Moradabad News"
-              category="moradabad"
-              articles={moradabadNews}
-            />
-          </section>
-        )}
-
-        {/* UP News */}
-        {upNews.length > 0 && (
-          <section className="bg-muted/30 py-12">
-            <div className="container mx-auto px-4">
-              <NewsByCategory 
-                title="UP News" 
-                category="up" 
-                articles={upNews} 
+        {/* Moradabad News - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.moradabad = el}
+          data-section="moradabad"
+          className="container mx-auto px-4 py-12"
+        >
+          {loadedSections.moradabad ? (
+            moradabadNews.length > 0 ? (
+              <NewsByCategory
+                title="Moradabad News"
+                category="moradabad"
+                articles={moradabadNews}
               />
+            ) : (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading Moradabad news...</p>
+              </div>
+            )
+          ) : (
+            <div className="text-center py-8">
+              <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
-        {/* India News */}
-        {indiaNews.length > 0 && (
-          <section className="container mx-auto px-4 py-12">
-            <NewsByCategory 
-              title="India News" 
-              category="india" 
-              articles={indiaNews} 
-            />
-          </section>
-        )}
+        {/* UP News - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.up = el}
+          data-section="up"
+          className="bg-muted/30 py-12"
+        >
+          <div className="container mx-auto px-4">
+            {loadedSections.up ? (
+              upNews.length > 0 ? (
+                <NewsByCategory 
+                  title="UP News" 
+                  category="up" 
+                  articles={upNews} 
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground">Loading UP news...</p>
+                </div>
+              )
+            ) : (
+              <div className="text-center py-8">
+                <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
+              </div>
+            )}
+          </div>
+        </section>
 
-        {/* Video Section - Controlled by Firebase */}
-        {activeVideo && (
-          <section className="bg-muted/30 py-12">
-            <div className="container mx-auto px-4">
-              <VideoSection video={activeVideo} />
+        {/* India News - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.india = el}
+          data-section="india"
+          className="container mx-auto px-4 py-12"
+        >
+          {loadedSections.india ? (
+            indiaNews.length > 0 ? (
+              <NewsByCategory 
+                title="India News" 
+                category="india" 
+                articles={indiaNews} 
+              />
+            ) : (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading India news...</p>
+              </div>
+            )
+          ) : (
+            <div className="text-center py-8">
+              <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
-        {/* Global News */}
-        {globalNews.length > 0 && (
-          <section className="container mx-auto px-4 py-12">
-            <NewsByCategory 
-              title="Global News" 
-              category="global" 
-              articles={globalNews} 
-            />
-          </section>
-        )}
+        {/* Video Section - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.video = el}
+          data-section="video"
+          className="bg-muted/30 py-12"
+        >
+          <div className="container mx-auto px-4">
+            {loadedSections.video ? (
+              activeVideo ? (
+                <VideoSection video={activeVideo} />
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No video content available</p>
+                </div>
+              )
+            ) : (
+              <div className="text-center py-8">
+                <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
+              </div>
+            )}
+          </div>
+        </section>
 
-        {/* Call-to-Action Section */}
-        <section className="bg-primary text-primary-foreground py-16">
+        {/* Global News - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.global = el}
+          data-section="global"
+          className="container mx-auto px-4 py-12"
+        >
+          {loadedSections.global ? (
+            globalNews.length > 0 ? (
+              <NewsByCategory 
+                title="Global News" 
+                category="global" 
+                articles={globalNews} 
+              />
+            ) : (
+              <div className="text-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground">Loading global news...</p>
+              </div>
+            )
+          ) : (
+            <div className="text-center py-8">
+              <div className="h-32 bg-muted/30 rounded-lg animate-pulse"></div>
+            </div>
+          )}
+        </section>
+
+        {/* Call-to-Action Section - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.cta = el}
+          data-section="cta"
+          className="bg-primary text-primary-foreground py-16"
+        >
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">Stay Updated with Moradabad News</h2>
             <p className="text-xl mb-8 opacity-90">
@@ -278,8 +506,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Local SEO Content */}
-        <section className="py-16 bg-muted/30 dark:bg-slate-800/50">
+        {/* Local SEO Content - Lazy Loaded */}
+        <section 
+          ref={el => sectionRefs.current.local = el}
+          data-section="local"
+          className="py-16 bg-muted/30 dark:bg-slate-800/50"
+        >
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600">
