@@ -14,6 +14,8 @@ import CategoryPage from './pages/CategoryPage'
 import ArticlePage from './pages/ArticlePage'
 import SearchPage from './pages/SearchPage'
 import SitemapPage from './pages/SitemapPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/TermsOfServicePage'
 import NotFoundPage from './pages/NotFoundPage'
 
 // Admin Pages
@@ -34,6 +36,7 @@ import AdminUsers from './pages/admin/AdminUsers'
 
 // Components
 import ProtectedRoute from './components/admin/ProtectedRoute'
+import { CookieConsent } from './components/CookieConsent'
 
 function App() {
   return (
@@ -52,6 +55,8 @@ function App() {
           <Route path="/news/:category/:slug" element={<ArticlePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/sitemap.xml" element={<SitemapPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
 
           {/* Admin Routes */}
           <Route path="/nimda" element={<AdminLogin />} />
@@ -73,6 +78,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Toaster />
+        <CookieConsent />
       </Router>
     </ThemeProvider>
   )

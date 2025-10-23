@@ -112,8 +112,18 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Moradabad News. All rights reserved.</p>
+        <div className="mt-8 border-t border-border pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <p>&copy; {new Date().getFullYear()} Moradabad News. All rights reserved.</p>
+            <div className="flex gap-6">
+              <Link to="/privacy-policy" className="hover:text-foreground">
+                Privacy Policy
+              </Link>
+              <Link to="/terms-of-service" className="hover:text-foreground">
+                Terms of Service
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
