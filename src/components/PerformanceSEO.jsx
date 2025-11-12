@@ -231,8 +231,8 @@ export default function PerformanceSEO({
       {/* Image optimization */}
       <meta name="image-optimization" content="lazy-loading,webp,avif" />
       
-      {/* Font optimization */}
-      <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      {/* Font optimization - only if font exists */}
+      {/* <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" /> */}
       
       {/* Critical resource preloading */}
       <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />

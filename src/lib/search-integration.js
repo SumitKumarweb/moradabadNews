@@ -92,10 +92,15 @@ class SearchIntegration {
 const searchIntegration = new SearchIntegration()
 
 // Auto-start listening in development
-if (import.meta.env.DEV) {
+// Disabled to prevent React errors - components should call startListening manually
+if (false && import.meta.env.DEV) {
   // Start listening after a short delay to ensure Firebase is initialized
   setTimeout(() => {
-    searchIntegration.startListening()
+    try {
+      searchIntegration.startListening()
+    } catch (error) {
+      console.warn('Auto-start search integration failed:', error)
+    }
   }, 1000)
 }
 

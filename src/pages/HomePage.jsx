@@ -1,18 +1,33 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react'
 import { SiteHeader } from '../components/SiteHeader'
 import { SiteFooter } from '../components/SiteFooter'
 import { HeroSection } from '../components/HeroSection'
-import { TrendingNews } from '../components/TrendingNews'
-import { NewsByCategory } from '../components/NewsByCategory'
-import { VideoSection } from '../components/VideoSection'
 import { HeaderBanner } from '../components/HeaderBanner'
 import SEO from '../components/SEO'
 import StaticSEO from '../components/SEO/StaticSEO'
 import LocalSEO from '../components/LocalSEO'
 import useAnalytics from '../hooks/use-analytics'
 import googleAnalytics from '../lib/google-analytics'
-import performanceOptimizer from '../lib/performance-optimization'
 import searchIntegration from '../lib/search-integration'
+
+// Lazy load non-critical components for better performance
+// Fix: Handle both named and default exports correctly to prevent React error #306
+const LazyTrendingNews = lazy(() => 
+  import('../components/TrendingNews').then(module => ({ 
+    default: module.TrendingNews || module.default 
+  }))
+)
+const LazyNewsByCategory = lazy(() => 
+  import('../components/NewsByCategory').then(module => ({ 
+    default: module.NewsByCategory || module.default 
+  }))
+)
+const LazyVideoSection = lazy(() => 
+  import('../components/VideoSection').then(module => ({ 
+    default: module.VideoSection || module.default 
+  }))
+)
+const LazyLocalSEO = lazy(() => import('../components/LocalSEO'))
 import { 
   getFeaturedArticles, 
   getTrendingArticles,
@@ -53,7 +68,7 @@ export default function HomePage() {
   const sectionRefs = useRef({})
   const observerRef = useRef(null)
 
-  // Track homepage visit
+  // Track homepage visit - call hook at top level, not inside useEffect
   useAnalytics({ pageType: 'home' })
 
   // Intersection Observer for lazy loading
@@ -140,8 +155,8 @@ export default function HomePage() {
     // Load only critical data first (hero section)
     loadCriticalData()
     
-    // Initialize performance optimizations
-    performanceOptimizer.init()
+    // Don't initialize performance optimizer here - it causes React errors
+    // Performance optimizations are handled by hooks and components
     
     // Track page view with Google Analytics
     googleAnalytics.trackPageView({
@@ -152,7 +167,14 @@ export default function HomePage() {
     })
     
     // Initialize search integration for real-time updates
-    searchIntegration.startListening()
+    // Wrap in try-catch to prevent errors from breaking the app
+    try {
+      if (searchIntegration && typeof searchIntegration.startListening === 'function') {
+        searchIntegration.startListening()
+      }
+    } catch (error) {
+      console.warn('Failed to start search integration:', error)
+    }
     
     // Track scroll depth
     let maxScroll = 0
@@ -280,7 +302,9 @@ export default function HomePage() {
         category="news"
         tags={["Moradabad", "UP", "India", "breaking news", "current affairs"]}
       />
-      <LocalSEO />
+            <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+              <LazyLocalSEO />
+            </Suspense>
       
       {headerBanners.length > 0 && <HeaderBanner banners={headerBanners} />}
       <SiteHeader />
@@ -335,7 +359,9 @@ export default function HomePage() {
         >
           {loadedSections.trending ? (
             trendingArticles.length > 0 ? (
-              <TrendingNews articles={trendingArticles} />
+              <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                <LazyTrendingNews articles={trendingArticles} />
+              </Suspense>
             ) : (
               <div className="text-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
@@ -357,11 +383,13 @@ export default function HomePage() {
         >
           {loadedSections.moradabad ? (
             moradabadNews.length > 0 ? (
-              <NewsByCategory
-                title="Moradabad News"
-                category="moradabad"
-                articles={moradabadNews}
-              />
+              <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                <LazyNewsByCategory
+                  title="Moradabad News"
+                  category="moradabad"
+                  articles={moradabadNews}
+                />
+              </Suspense>
             ) : (
               <div className="text-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
@@ -384,11 +412,13 @@ export default function HomePage() {
           <div className="container mx-auto px-4">
             {loadedSections.up ? (
               upNews.length > 0 ? (
-                <NewsByCategory 
-                  title="UP News" 
-                  category="up" 
-                  articles={upNews} 
-                />
+                <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                  <LazyNewsByCategory 
+                    title="UP News" 
+                    category="up" 
+                    articles={upNews} 
+                  />
+                </Suspense>
               ) : (
                 <div className="text-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
@@ -411,11 +441,13 @@ export default function HomePage() {
         >
           {loadedSections.india ? (
             indiaNews.length > 0 ? (
-              <NewsByCategory 
-                title="India News" 
-                category="india" 
-                articles={indiaNews} 
-              />
+                <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                  <LazyNewsByCategory 
+                    title="India News" 
+                    category="india" 
+                    articles={indiaNews} 
+                  />
+                </Suspense>
             ) : (
               <div className="text-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />
@@ -438,7 +470,9 @@ export default function HomePage() {
           <div className="container mx-auto px-4">
             {loadedSections.video ? (
               activeVideo ? (
-                <VideoSection video={activeVideo} />
+                <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                <LazyVideoSection video={activeVideo} />
+              </Suspense>
               ) : (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground">No video content available</p>
@@ -460,11 +494,13 @@ export default function HomePage() {
         >
           {loadedSections.global ? (
             globalNews.length > 0 ? (
-              <NewsByCategory 
-                title="Global News" 
-                category="global" 
-                articles={globalNews} 
-              />
+                <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+                  <LazyNewsByCategory 
+                    title="Global News" 
+                    category="global" 
+                    articles={globalNews} 
+                  />
+                </Suspense>
             ) : (
               <div className="text-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-4" />

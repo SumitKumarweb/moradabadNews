@@ -62,18 +62,28 @@ export function usePerformance() {
     const criticalResources = [
       '/logo.svg',
       '/favicon.ico',
-      '/fonts/inter-var.woff2'
+      // Only include fonts that exist
+      // '/fonts/inter-var.woff2'
     ]
 
     criticalResources.forEach(resource => {
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.href = resource
-      link.as = resource.endsWith('.woff2') ? 'font' : 'image'
-      if (resource.endsWith('.woff2')) {
-        link.crossOrigin = 'anonymous'
-      }
-      document.head.appendChild(link)
+      // Verify resource exists before preloading
+      fetch(resource, { method: 'HEAD' })
+        .then(response => {
+          if (response.ok) {
+            const link = document.createElement('link')
+            link.rel = 'preload'
+            link.href = resource
+            link.as = resource.endsWith('.woff2') ? 'font' : 'image'
+            if (resource.endsWith('.woff2')) {
+              link.crossOrigin = 'anonymous'
+            }
+            document.head.appendChild(link)
+          }
+        })
+        .catch(() => {
+          // Silently fail if resource doesn't exist
+        })
     })
   }, [])
 
@@ -106,6 +116,8 @@ export function usePerformance() {
 
   // Initialize performance monitoring
   useEffect(() => {
+    // Use empty dependency array to ensure this runs only once
+    // This prevents React error #321 (hooks order changes)
     measureCoreWebVitals()
     measureTTFB()
     preloadCriticalResources()
@@ -149,7 +161,8 @@ export function usePerformance() {
     return () => {
       window.removeEventListener('load', reportMetrics)
     }
-  }, [measureCoreWebVitals, measureTTFB, preloadCriticalResources, optimizeImages, deferNonCriticalJS])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty array - these functions are stable and don't need to be in deps
 
   return {
     metrics: performanceRef.current.metrics,

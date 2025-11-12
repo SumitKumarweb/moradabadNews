@@ -396,7 +396,19 @@ class SearchService {
 const searchService = new SearchService()
 
 // Initialize search service with Firebase data
-searchService.initializeSearchIndex()
+// Wrap in try-catch and delay to prevent blocking
+if (typeof window !== 'undefined') {
+  // Delay initialization to prevent blocking React render
+  setTimeout(() => {
+    try {
+      searchService.initializeSearchIndex().catch(error => {
+        console.warn('Search index initialization failed:', error)
+      })
+    } catch (error) {
+      console.warn('Search service initialization error:', error)
+    }
+  }, 1000)
+}
 
 export default searchService
 

@@ -20,19 +20,31 @@ let db
 let auth
 let analytics = null
 
-// Client-side initialization (Vite runs in browser only)
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig)
-} else {
-  app = getApps()[0]
-}
+// Initialize Firebase (works for both client and server-side)
+try {
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig)
+  } else {
+    app = getApps()[0]
+  }
 
-db = getFirestore(app)
-auth = getAuth(app)
+  db = getFirestore(app)
+  auth = getAuth(app)
 
-// Analytics
-if (typeof window !== 'undefined') {
-  analytics = getAnalytics(app)
+  // Analytics only for client-side
+  if (typeof window !== 'undefined') {
+    try {
+      analytics = getAnalytics(app)
+    } catch (error) {
+      // Analytics might fail in some environments, that's okay
+      console.warn('Analytics initialization failed:', error.message)
+    }
+  }
+} catch (error) {
+  console.error('Firebase initialization error:', error)
+  // Set db to null if initialization fails
+  db = null
+  auth = null
 }
 
 export { app, db, auth, analytics }

@@ -102,10 +102,13 @@ class PerformanceOptimizer {
 
   // Preload critical resources
   setupResourcePreloading() {
+    // Only preload resources that actually exist
+    // Check if resources exist before preloading to avoid 404 errors
     const criticalResources = [
-      { href: '/fonts/inter.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
-      { href: '/css/critical.css', as: 'style' },
-      { href: '/js/critical.js', as: 'script' }
+      // Only include resources that are known to exist
+      // { href: '/fonts/inter.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
+      // { href: '/css/critical.css', as: 'style' },
+      // { href: '/js/critical.js', as: 'script' }
     ]
 
     criticalResources.forEach(resource => {
@@ -113,20 +116,30 @@ class PerformanceOptimizer {
     })
   }
 
-  // Preload a single resource
+  // Preload a single resource with error handling
   preloadResource({ href, as, type, crossorigin }) {
     if (this.resourceHints.has(href)) return
 
-    const link = document.createElement('link')
-    link.rel = 'preload'
-    link.href = href
-    link.as = as
-    
-    if (type) link.type = type
-    if (crossorigin) link.crossOrigin = crossorigin
-    
-    document.head.appendChild(link)
-    this.resourceHints.add(href)
+    // Verify resource exists before preloading
+    fetch(href, { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          const link = document.createElement('link')
+          link.rel = 'preload'
+          link.href = href
+          link.as = as
+          
+          if (type) link.type = type
+          if (crossorigin) link.crossOrigin = crossorigin
+          
+          document.head.appendChild(link)
+          this.resourceHints.add(href)
+        }
+      })
+      .catch(() => {
+        // Silently fail if resource doesn't exist
+        // Don't log 404 errors for optional resources
+      })
   }
 
   // Setup service worker for caching
@@ -181,10 +194,12 @@ class PerformanceOptimizer {
 
   // Optimize font loading
   optimizeFontLoading() {
-    // Preload font files
+    // Only preload fonts that actually exist
+    // Check if font files exist before preloading to avoid 404 errors
     const fontFiles = [
-      '/fonts/inter-regular.woff2',
-      '/fonts/inter-bold.woff2'
+      // Only include fonts that are known to exist
+      // '/fonts/inter-regular.woff2',
+      // '/fonts/inter-bold.woff2'
     ]
     
     fontFiles.forEach(font => {
@@ -381,12 +396,52 @@ class PerformanceOptimizer {
 // Create singleton instance
 const performanceOptimizer = new PerformanceOptimizer()
 
-// Auto-initialize
-if (typeof window !== 'undefined') {
+// Auto-initialize - but wait for React to be ready
+// Disable auto-initialization to prevent React errors
+// Components should initialize manually using useEffect
+if (typeof window !== 'undefined' && false) { // Disabled auto-init
+  // Wait for React to mount before initializing performance optimizations
+  // This prevents React error #321 (rendering outside root)
+  const initPerformanceOptimizer = () => {
+    // Check if React root exists and has content
+    const rootElement = document.getElementById('root')
+    if (rootElement && rootElement.children.length > 0) {
+      // React has mounted, safe to initialize
+      try {
+        performanceOptimizer.init()
+      } catch (error) {
+        console.warn('Performance optimizer initialization failed:', error)
+      }
+    } else {
+      // Wait a bit more for React to mount (max 5 seconds)
+      const maxAttempts = 50
+      let attempts = 0
+      const checkInterval = setInterval(() => {
+        attempts++
+        const rootElement = document.getElementById('root')
+        if (rootElement && rootElement.children.length > 0) {
+          clearInterval(checkInterval)
+          try {
+            performanceOptimizer.init()
+          } catch (error) {
+            console.warn('Performance optimizer initialization failed:', error)
+          }
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkInterval)
+          console.warn('Performance optimizer: React root not found after max attempts')
+        }
+      }, 100)
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => performanceOptimizer.init())
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for React to mount
+      setTimeout(initPerformanceOptimizer, 1000)
+    })
   } else {
-    performanceOptimizer.init()
+    // DOM already loaded, wait for React
+    setTimeout(initPerformanceOptimizer, 1000)
   }
 }
 
