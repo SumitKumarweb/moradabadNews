@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5004;
 
 // Middleware
 app.use(cors());
@@ -95,43 +95,21 @@ app.use(async (req, res, next) => {
   }
   
   try {
-    // Get route metadata
-    let metadata = getRouteMetadata(req);
+    // Get route metadata (now async - fetches article data for article pages)
+    let metadata = await getRouteMetadata(req);
     
-    // Fetch additional data for article and category pages
-    if (metadata.pageType === 'article' && metadata.params?.category && metadata.params?.slug) {
-      const articleData = await fetchArticleData(metadata.params.category, metadata.params.slug);
-      if (articleData) {
-        // Directly map ALL article fields to metadata - article has all metadata fields
-        // Use article metadata fields directly (metaTitle, metaDescription, metaKeywords, ogImage)
-        metadata = {
-          ...metadata,
-          // Map all article metadata fields directly - prioritize meta fields
-          title: articleData.metaTitle || articleData.title || articleData.englishTitle || 'Article',
-          description: articleData.metaDescription || articleData.excerpt || articleData.description || articleData.summary || '',
-          keywords: articleData.metaKeywords || articleData.keywords || (articleData.tags ? articleData.tags.join(', ') : ''),
-          // Use ogImage if available, otherwise use image
-          image: articleData.ogImage || articleData.image || metadata.image,
-          content: articleData.content || '',
-          author: articleData.author || '',
-          publishedAt: articleData.publishedAt,
-          modifiedAt: articleData.modifiedAt || articleData.publishedAt,
-          tags: articleData.tags || [],
-          category: articleData.category || metadata.params?.category,
-          // Include all other article fields that might be useful
-          slug: articleData.slug || metadata.params?.slug,
-          id: articleData.id,
-          isFeatured: articleData.isFeatured || false,
-          isTrending: articleData.isTrending || false,
-          views: articleData.views || 0
-        };
-        
-        // Log for debugging (can be removed in production)
-        console.log(`📰 Article metadata loaded: ${metadata.title.substring(0, 50)}...`);
-      } else {
-        console.warn(`⚠️  Article not found: ${metadata.params?.category}/${metadata.params?.slug}`);
-      }
-    } else if (metadata.pageType === 'category' && metadata.params?.category) {
+    // For article pages, metadata is already fetched in getRouteMetadata
+    // Just log it for debugging
+    if (metadata.pageType === 'article') {
+      console.log(`✅ Article metadata loaded:`);
+      console.log(`   Title: ${metadata.title?.substring(0, 60)}...`);
+      console.log(`   Description: ${metadata.description?.substring(0, 60)}...`);
+      console.log(`   Image: ${metadata.image}`);
+      console.log(`   Keywords: ${metadata.keywords?.substring(0, 60)}...`);
+    }
+    
+    // Fetch category data for category pages
+    if (metadata.pageType === 'category' && metadata.params?.category) {
       const categoryData = await fetchCategoryData(metadata.params.category);
       if (categoryData) {
         metadata = {

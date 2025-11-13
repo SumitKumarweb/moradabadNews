@@ -11,7 +11,7 @@ import {
   Timestamp,
   increment,
 } from "firebase/firestore"
-import { db, auth } from "./firebase"
+import { db, auth } from "./firebase.js"
 import { signInWithEmailAndPassword, updatePassword, updateEmail } from "firebase/auth"
 
 // Data shape comments for reference:

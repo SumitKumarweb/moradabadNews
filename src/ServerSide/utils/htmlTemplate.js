@@ -161,6 +161,7 @@ export function generateHTML(metadata = {}) {
     customStructuredData = null
   } = metadata;
 
+ 
   // Generate SEO data
   const seoData = {
     title,

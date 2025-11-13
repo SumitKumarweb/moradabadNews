@@ -4,13 +4,12 @@
  */
 
 import { generateCanonicalUrl, SITE_CONFIG } from '../../lib/seo-utils.js';
-import { db } from '../../lib/firebase.js';
-import { collection, query, where, getDocs, doc, getDoc, limit, orderBy } from 'firebase/firestore';
+import { getArticleById, getAllArticles } from '../../lib/firebase-service.js';
 
 /**
  * Extract metadata from route
  */
-export function getRouteMetadata(req) {
+export async function getRouteMetadata(req) {
   const { path, query } = req;
   const baseUrl = req.protocol + '://' + req.get('host');
   const fullUrl = baseUrl + path;
@@ -43,6 +42,29 @@ export function getRouteMetadata(req) {
       };
 
     case 'article':
+      // Fetch actual article data from Firebase to get real title
+      if (params?.category && params?.slug) {
+        const articleData = await fetchArticleData(params.category, params.slug);
+        console.log(articleData ,'articleDataarticleData' )
+        if (articleData) {
+          return {
+            ...metadata,
+            title: articleData.metaTitle || articleData.title || articleData.englishTitle || 'Article',
+            description: articleData.metaDescription || articleData.excerpt || articleData.description || articleData.summary || `Read the latest article on ${SITE_CONFIG.name}`,
+            keywords: articleData.metaKeywords || articleData.keywords || (articleData.tags ? articleData.tags.join(', ') : ''),
+            image: articleData.ogImage || articleData.image || `${baseUrl}/logo.svg`,
+            category: articleData.category || params?.category,
+            slug: articleData.slug || params?.slug || params?.id,
+            id: articleData.id || params?.slug || params?.id,
+            author: articleData.author,
+            publishedAt: articleData.publishedAt,
+            modifiedAt: articleData.modifiedAt,
+            tags: articleData.tags || [],
+            content: articleData.content
+          };
+        }
+      }
+      // Fallback if article not found
       return {
         ...metadata,
         title: 'Article',
@@ -50,8 +72,6 @@ export function getRouteMetadata(req) {
         category: params?.category,
         slug: params?.slug || params?.id,
         id: params?.slug || params?.id,
-        // TODO: Fetch actual article data from Firebase/database
-        // This will be enhanced when integrating with data source
       };
 
     case 'category':
@@ -212,70 +232,65 @@ function determinePageType(path) {
  */
 export async function fetchArticleData(category, slug) {
   try {
-    if (!db) {
-      console.warn('Firebase not initialized for server-side');
-      return null;
-    }
+    console.log(`🔍 Fetching article: category="${category}", slug="${slug}"`);
 
-    const articlesRef = collection(db, 'articles');
-    
-    // Try to find article by slug and category
-    // Note: Firestore requires index for compound queries, so we'll filter status after fetching
-    let articleQuery = query(
-      articlesRef,
-      where('category', '==', category),
-      where('slug', '==', slug),
-      limit(1)
-    );
-    
-    let snapshot = await getDocs(articleQuery);
-    
-    // Filter by status if needed (after fetching to avoid index requirement)
-    if (!snapshot.empty) {
-      const articleDoc = snapshot.docs[0];
-      const data = articleDoc.data();
-      // Check if article is published (if status field exists)
-      if (data.status && data.status !== 'published') {
-        // Article exists but not published, return null
-        return null;
+    // Strategy 1: Try by document ID first (slug might be the document ID)
+    try {
+      const articleData = await getArticleById(slug);
+      console.log(articleData , 'articlarticleDataeData')
+      if (articleData) {
+        // Verify category matches (case-insensitive) and article is published
+        const articleCategory = (articleData.category || '').toLowerCase();
+        const searchCategory = (category || '').toLowerCase();
+        
+        if (articleCategory === searchCategory && (!articleData.status || articleData.status === 'published')) {
+          console.log(`✅ Found article by ID: ${articleData.id}`);
+          // Convert Firestore Timestamps to ISO strings if needed
+          return {
+            ...articleData,
+            publishedAt: articleData.publishedAt?.toDate?.()?.toISOString() || articleData.publishedAt,
+            modifiedAt: articleData.modifiedAt?.toDate?.()?.toISOString() || articleData.modifiedAt
+          };
+        } else {
+          console.log(`⚠️  Article found but category mismatch: ${articleCategory} !== ${searchCategory}`);
+        }
       }
+    } catch (error) {
+      console.warn('⚠️  Error fetching article by ID:', error.message);
     }
     
-    // If not found by slug, try by ID (slug might be the document ID)
-    if (snapshot.empty) {
-      try {
-        const docRef = doc(db, 'articles', slug);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          // Verify category matches and article is published (if status field exists)
-          if (data.category === category && (!data.status || data.status === 'published')) {
+    // Strategy 2: If not found by ID, search all articles by slug field
+    try {
+      const allArticles = await getAllArticles();
+      if (allArticles && allArticles.length > 0) {
+        // Filter by slug and category
+        for (const article of allArticles) {
+          const articleSlug = article.slug || article.id;
+          const articleCategory = (article.category || '').toLowerCase();
+          const searchCategory = (category || '').toLowerCase();
+          
+          if (articleSlug === slug && 
+              articleCategory === searchCategory && 
+              (!article.status || article.status === 'published')) {
+            console.log(`✅ Found article by slug: ${article.id}`);
+            // Convert Firestore Timestamps to ISO strings if needed
             return {
-              id: docSnap.id,
-              ...data,
-              publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.publishedAt,
-              modifiedAt: data.modifiedAt?.toDate?.()?.toISOString() || data.modifiedAt
+              ...article,
+              publishedAt: article.publishedAt?.toDate?.()?.toISOString() || article.publishedAt,
+              modifiedAt: article.modifiedAt?.toDate?.()?.toISOString() || article.modifiedAt
             };
           }
         }
-      } catch (error) {
-        console.warn('Error fetching article by ID:', error);
       }
-    } else {
-      // Found by slug
-      const articleDoc = snapshot.docs[0];
-      const data = articleDoc.data();
-      return {
-        id: articleDoc.id,
-        ...data,
-        publishedAt: data.publishedAt?.toDate?.()?.toISOString() || data.publishedAt,
-        modifiedAt: data.modifiedAt?.toDate?.()?.toISOString() || data.modifiedAt
-      };
+    } catch (error) {
+      console.warn('⚠️  Error fetching articles by slug:', error.message);
     }
     
+    console.log(`❌ Article not found: category="${category}", slug="${slug}"`);
     return null;
   } catch (error) {
-    console.error('Error fetching article data from Firebase:', error);
+    console.error('❌ Error fetching article data from Firebase:', error);
+    console.error('Stack:', error.stack);
     return null;
   }
 }
